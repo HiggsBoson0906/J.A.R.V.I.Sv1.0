@@ -7,7 +7,7 @@ import PerformanceInsights from './components/PerformanceInsights';
 import ProfileSettings from './components/ProfileSettings';
 import VideoProcessor from './components/VideoProcessor';
 import EnhancedAITutor from './components/EnhancedAITutor';
-import AdaptivePracticeDashboard from './components/AdaptivePracticeDashboard';
+import AdaptivePracticeDashboard from './components/AdaptivePracticeDashboard.jsx';
 import { TimerProvider } from './components/TimerContext';
 
 function App() {
