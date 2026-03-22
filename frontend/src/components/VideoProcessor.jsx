@@ -1,17 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
-import { Play, Link, Zap, Sparkles, AlertCircle, CheckCircle, ListPlus, Loader2 } from 'lucide-react';
+import { Play, Link, Zap, Sparkles, AlertCircle, CheckCircle, ListPlus, Loader2, Copy, Download, Highlighter } from 'lucide-react';
 
 export default function VideoProcessor() {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
+  const [hasStarted, setHasStarted] = useState(false);
+
+  // Scroll Reveal for animations
+  useEffect(() => {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('section-visible');
+            }
+        });
+    }, observerOptions);
+
+    const revealSections = document.querySelectorAll('.section-enter');
+    revealSections.forEach(section => {
+        observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [results, isLoading, hasStarted]);
 
   const handleGenerate = async () => {
     if (!url) return;
     setIsLoading(true);
+    setHasStarted(true);
     setError('');
+    
+    // Auto-scroll slightly to focus on video
+    window.scrollTo({ top: 150, behavior: 'smooth' });
+
     try {
       const response = await fetch('http://localhost:3001/api/process-video', {
         method: 'POST',
@@ -31,7 +61,6 @@ export default function VideoProcessor() {
     }
   };
 
-  // Helper to extract video ID for thumbnail
   const getVideoId = (link) => {
     const match = link.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     return match ? match[1] : null;
@@ -49,17 +78,17 @@ export default function VideoProcessor() {
           
           {/* Header Section */}
           <header className="space-y-2">
-            <h2 className="text-4xl font-extrabold tracking-tight text-on-surface font-headline">Video Learning Assistant</h2>
-            <p className="text-on-surface-variant opacity-70">Convert complex lectures into structured, actionable study notes with AI.</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-on-surface dark:text-slate-50 font-headline">Video Learning Assistant</h2>
+            <p className="text-on-surface-variant dark:text-slate-400 opacity-70">Convert complex lectures into structured, actionable study notes with AI.</p>
           </header>
 
           {/* Input Section */}
-          <section className="bg-surface-container-low p-8 rounded-2xl shadow-sm border border-outline-variant/10">
+          <section className="bg-surface-container-low dark:bg-slate-900/50 p-8 rounded-2xl shadow-sm border border-outline-variant/10 dark:border-slate-800">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
-                <Link className="absolute left-5 top-1/2 -translate-y-1/2 text-cyan-600 w-5 h-5" />
+                <Link className="absolute left-5 top-1/2 -translate-y-1/2 text-cyan-600 dark:text-cyan-400 w-5 h-5" />
                 <input 
-                  className="w-full bg-white border-none rounded-xl pl-14 pr-6 py-5 text-base shadow-sm focus:ring-2 focus:ring-cyan-500/20 placeholder:text-outline-variant outline-none" 
+                  className="w-full bg-white dark:bg-slate-800 dark:text-white border border-transparent dark:border-slate-700 rounded-xl pl-14 pr-6 py-5 text-base shadow-sm focus:ring-2 focus:ring-cyan-500/50 placeholder:text-outline-variant dark:placeholder-slate-400 outline-none transition-all" 
                   placeholder="Paste YouTube video link..." 
                   type="text" 
                   value={url}
@@ -69,124 +98,153 @@ export default function VideoProcessor() {
               <button 
                 onClick={handleGenerate}
                 disabled={isLoading || !url}
-                className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white px-10 py-5 rounded-xl font-bold text-lg shadow-lg shadow-cyan-200/50 hover:scale-[1.02] active:scale-95 transition-all outline-none cursor-pointer disabled:opacity-50 flex items-center gap-2 justify-center"
+                className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white px-10 py-5 rounded-xl font-bold text-lg shadow-lg shadow-cyan-200/50 dark:shadow-cyan-900/50 hover:scale-[1.02] active:scale-95 transition-all outline-none cursor-pointer disabled:opacity-50 flex items-center gap-2 justify-center"
               >
                 {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : null}
                 {isLoading ? 'Processing...' : 'Generate Notes'}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+            {error && <p className="text-red-500 dark:text-red-400 text-sm mt-3">{error}</p>}
           </section>
 
-          {/* Main Workspace Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Main Workspace - Adaptive Layout */}
+          <div className={`transition-all duration-700 ease-in-out ${hasStarted ? 'flex flex-col gap-10' : 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-start'}`}>
             
-            {/* Left: Video Player */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="aspect-video w-full bg-slate-200 rounded-2xl overflow-hidden relative shadow-xl shadow-slate-200/50 group">
-                <img 
-                  alt="Video Thumbnail" 
-                  className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
-                  src={thumbnailUrl} 
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/5 transition-colors cursor-pointer">
-                  <button className="w-20 h-20 bg-white/95 backdrop-blur rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform text-cyan-600 cursor-pointer">
-                    <Play className="w-8 h-8 ml-1" fill="currentColor" />
-                  </button>
-                </div>
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="bg-black/40 backdrop-blur-md p-4 rounded-xl text-white">
-                    <h3 className="font-bold">{videoId ? 'Selected YouTube Video' : 'Physics 201: Rotational Dynamics'}</h3>
-                    <p className="text-xs opacity-80">{videoId ? 'Video Loaded' : 'MIT OpenCourseWare • 45:12'}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-outline-variant/10">
-                <div className="flex items-center gap-4">
-                  <div className="bg-cyan-50 dark:bg-cyan-900/20 p-2 rounded-xl">
-                    <Zap className="text-cyan-600 dark:text-cyan-400 w-5 h-5" />
-                  </div>
-                  <span className="font-bold text-slate-900 dark:text-slate-50">Processing Speed: 1.5x</span>
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-cyan-600 hover:text-white transition-colors border border-outline-variant/20 cursor-pointer">CC Available</button>
-                  <button className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-cyan-600 hover:text-white transition-colors border border-outline-variant/20 cursor-pointer">High Def</button>
-                </div>
+            {/* Video Player Section */}
+            <div className={`transition-all duration-700 w-full ${hasStarted ? 'w-full' : 'lg:col-span-12'} section-enter ${hasStarted || videoId ? 'section-visible' : ''}`}>
+              <div className={`w-full bg-slate-900 rounded-2xl overflow-hidden relative shadow-2xl group transition-all duration-700 border border-slate-200 dark:border-slate-800 ${hasStarted ? 'aspect-video lg:h-[70vh] max-h-[800px]' : 'aspect-video max-h-[500px]'}`}>
+                {hasStarted && videoId ? (
+                  <iframe 
+                    className="w-full h-full border-0 absolute inset-0"
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <>
+                    <img 
+                      alt="Video Thumbnail" 
+                      className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
+                      src={thumbnailUrl} 
+                    />
+                    <div 
+                      className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors cursor-pointer" 
+                      onClick={videoId ? handleGenerate : undefined}
+                    >
+                      <button className="w-24 h-24 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform text-cyan-600 dark:text-cyan-400 cursor-pointer">
+                        <Play className="w-10 h-10 ml-2" fill="currentColor" />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Right: AI Notes Card */}
-            <div className="lg:col-span-5">
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-xl shadow-cyan-500/5 border border-outline-variant/10 min-h-full">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-xl flex items-center justify-center text-cyan-600 dark:text-cyan-400">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xl font-bold font-headline text-slate-900 dark:text-slate-50">AI Structured Notes</h3>
-                </div>
-                
-                {isLoading ? (
-                  <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                     <Loader2 className="w-10 h-10 text-cyan-600 animate-spin" />
-                     <p className="text-slate-500 text-sm font-medium">Extracting transcript & generating notes...</p>
-                  </div>
-                ) : results ? (
-                  <div className="space-y-10">
-                    {/* Summary */}
-                    <div className="space-y-3">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">Executive Summary</h4>
-                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                        {results.summary}
-                      </p>
+            {/* AI Notes Section Below Video */}
+            {hasStarted && (
+              <div className="w-full section-enter animate-[fadeUp_0.8s_ease-out_forwards]">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 lg:p-12 shadow-xl shadow-cyan-500/5 dark:shadow-cyan-900/10 border border-outline-variant/10 dark:border-slate-800 min-h-full">
+                  
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 pb-6 border-b border-outline-variant/10 dark:border-slate-800">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/50 rounded-xl flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-2xl font-bold font-headline text-slate-900 dark:text-slate-50">
+                        {results?.title || "AI Structured Notes"}
+                      </h3>
                     </div>
                     
-                    {/* Key Concepts */}
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">Key Concepts</h4>
-                      <ul className="space-y-3">
-                        {results.concepts?.map((c, i) => (
-                          <li key={i} className="flex items-start gap-3 group">
-                            <span className="w-2 h-2 mt-2 rounded-full bg-cyan-500 group-hover:scale-125 transition-transform"></span>
-                            <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">{c}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    {/* Important Points */}
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">Important Points</h4>
-                      <ul className="space-y-4">
-                        {results.key_points?.map((p, i) => (
-                          <li key={i} className="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm leading-relaxed border border-outline-variant/10">
-                            {i % 2 === 0 ? 
-                              <AlertCircle className="text-cyan-600 dark:text-cyan-400 w-5 h-5 flex-shrink-0 mt-0.5" /> : 
-                              <CheckCircle className="text-cyan-600 dark:text-cyan-400 w-5 h-5 flex-shrink-0 mt-0.5" />
-                            }
-                            <span className="text-slate-600 dark:text-slate-300">{p}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    {/* Footer Action */}
-                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                      <button className="w-full py-4 bg-slate-50 dark:bg-slate-800 hover:bg-cyan-600 hover:dark:bg-cyan-600 hover:text-white text-slate-900 dark:text-slate-50 font-bold rounded-full transition-all flex items-center justify-center gap-2 border border-outline-variant/10 shadow-sm cursor-pointer">
-                        <ListPlus className="w-5 h-5" />
-                        Add to Study Plan
+                    {/* Extra Features Buttons */}
+                    <div className="flex items-center gap-3">
+                      <button className="p-3 bg-surface-container-low dark:bg-slate-800 hover:bg-cyan-50 hover:dark:bg-cyan-900/50 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl text-slate-500 dark:text-slate-400 transition-colors border border-outline-variant/20 dark:border-slate-700 shadow-sm" title="Copy Notes">
+                        <Copy size={18} />
+                      </button>
+                      <button className="p-3 bg-surface-container-low dark:bg-slate-800 hover:bg-cyan-50 hover:dark:bg-cyan-900/50 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl text-slate-500 dark:text-slate-400 transition-colors border border-outline-variant/20 dark:border-slate-700 shadow-sm" title="Download PDF">
+                        <Download size={18} />
+                      </button>
+                      <button className="p-3 bg-surface-container-low dark:bg-slate-800 hover:bg-cyan-50 hover:dark:bg-cyan-900/50 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl text-slate-500 dark:text-slate-400 transition-colors border border-outline-variant/20 dark:border-slate-700 shadow-sm" title="Highlight Important Lines">
+                        <Highlighter size={18} />
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-64 text-center space-y-3 opacity-50">
-                     <AlertCircle className="w-10 h-10 text-slate-400" />
-                     <p className="text-slate-500 text-sm font-medium">Paste a YouTube link and click "Generate Notes" to start.</p>
-                  </div>
-                )}
-                
+                  
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20 space-y-6">
+                       <div className="relative">
+                         <div className="w-16 h-16 border-4 border-cyan-100 dark:border-slate-800 rounded-full"></div>
+                         <div className="w-16 h-16 border-4 border-cyan-500 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+                       </div>
+                       <p className="text-slate-500 dark:text-slate-400 text-lg font-medium animate-pulse">Extracting transcript & restructuring knowledge...</p>
+                    </div>
+                  ) : results ? (
+                    <div className="space-y-12">
+                      {/* Summary */}
+                      <div className="space-y-4">
+                        <h4 className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
+                          <Zap size={14} className="text-cyan-500" /> Executive Summary
+                        </h4>
+                        <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base bg-surface-container-low dark:bg-slate-800/50 p-6 rounded-2xl border border-outline-variant/10 dark:border-slate-700">
+                          {results.summary}
+                        </p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+                        {/* Key Concepts */}
+                        <div className="space-y-4">
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 border-b border-outline-variant/20 dark:border-slate-800 pb-2">Key Concepts</h4>
+                          <ul className="space-y-4">
+                            {results.concepts?.map((c, i) => (
+                              <li key={i} className="flex items-start gap-4 p-4 hover:bg-surface-container-low dark:hover:bg-slate-800/80 rounded-xl transition-colors border border-transparent hover:border-outline-variant/10 dark:hover:border-slate-700">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 text-xs font-bold mt-0.5 shrink-0">{i + 1}</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{c}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        {/* Important Points */}
+                        <div className="space-y-4">
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 border-b border-outline-variant/20 dark:border-slate-800 pb-2">Important Points</h4>
+                          <ul className="space-y-4">
+                            {results.key_points?.map((p, i) => (
+                              <li key={i} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-sm leading-relaxed border border-outline-variant/10 dark:border-slate-700">
+                                <CheckCircle className="text-cyan-500 dark:text-cyan-400 min-w-[20px] w-5 h-5 flex-shrink-0 mt-0.5" />
+                                <span className="text-slate-700 dark:text-slate-300">{p}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Formulas (if any) */}
+                      {results.formulas && results.formulas.length > 0 && (
+                        <div className="space-y-4 pt-6">
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 border-b border-outline-variant/20 dark:border-slate-800 pb-2">Key Formulas</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {results.formulas.map((f, i) => (
+                              <div key={i} className="bg-slate-900 border border-slate-700 text-cyan-300 p-5 rounded-xl font-mono text-sm shadow-inner">
+                                {f}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Footer Action */}
+                      <div className="mt-12 pt-8 border-t border-outline-variant/10 dark:border-slate-800">
+                        <button className="w-full md:w-auto px-10 py-4 bg-slate-50 dark:bg-slate-800 hover:bg-cyan-600 hover:dark:bg-cyan-600 hover:text-white dark:hover:text-white text-slate-900 dark:text-slate-50 font-bold rounded-full transition-all flex items-center justify-center gap-3 border border-outline-variant/10 dark:border-slate-700 shadow-sm cursor-pointer mx-auto">
+                          <ListPlus className="w-5 h-5" />
+                          Add to Study Plan
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                  
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
         </div>

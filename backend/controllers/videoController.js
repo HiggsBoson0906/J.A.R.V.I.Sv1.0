@@ -50,9 +50,11 @@ exports.processVideo = async (req, res) => {
             return res.json({
                 success: true,
                 data: {
+                    title: "Mock Title (set GEMINI_API_KEY)",
                     summary: "Mock summary (set GEMINI_API_KEY for real output)",
                     concepts: ["Mock Concept 1", "Mock Concept 2"],
-                    key_points: ["Mock point 1", "Mock point 2"]
+                    key_points: ["Mock point 1", "Mock point 2"],
+                    formulas: ["E = mc^2", "v = u + at"]
                 }
             });
         }
@@ -60,14 +62,22 @@ exports.processVideo = async (req, res) => {
         const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
-You are an expert JEE/NEET teacher.
+Summarize the YouTube video into structured JEE/NEET study notes.
+Include:
+- Key concepts
+- Important points
+- Formulas (if any)
+- Simple explanation
+Keep it concise and student-friendly.
 
 Return ONLY valid JSON (no markdown, no explanation):
 
 {
+  "title": "string",
   "summary": "string",
   "concepts": ["string"],
-  "key_points": ["string"]
+  "key_points": ["string"],
+  "formulas": ["string"]
 }
 
 Transcript:

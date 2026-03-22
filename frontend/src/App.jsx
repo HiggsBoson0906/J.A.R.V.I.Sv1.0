@@ -7,6 +7,7 @@ import PerformanceInsights from './components/PerformanceInsights';
 import Resources from './components/Resources';
 import ProfileSettings from './components/ProfileSettings';
 import VideoProcessor from './components/VideoProcessor';
+import EnhancedAITutor from './components/EnhancedAITutor';
 import { TimerProvider } from './components/TimerContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/timer" element={<FocusTimer />} />
           <Route path="/performance" element={<PerformanceInsights />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/ai-tutor" element={<EnhancedAITutor />} />
           <Route path="/video-processor" element={<VideoProcessor />} />
           <Route path="/profile" element={<ProfileSettings />} />
         </Routes>
