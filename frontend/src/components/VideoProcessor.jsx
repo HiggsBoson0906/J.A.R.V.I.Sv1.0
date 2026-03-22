@@ -121,22 +121,29 @@ export default function VideoProcessor() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowFullScreen
                   ></iframe>
-                ) : (
+                ) : videoId ? (
                   <>
                     <img 
                       alt="Video Thumbnail" 
                       className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
-                      src={thumbnailUrl} 
+                      src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
                     />
                     <div 
                       className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors cursor-pointer" 
-                      onClick={videoId ? handleGenerate : undefined}
+                      onClick={handleGenerate}
                     >
                       <button className="w-24 h-24 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform text-cyan-600 dark:text-cyan-400 cursor-pointer">
                         <Play className="w-10 h-10 ml-2" fill="currentColor" />
                       </button>
                     </div>
                   </>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black gap-4">
+                    <div className="w-20 h-20 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                      <Play className="w-8 h-8 ml-1 text-slate-600" fill="currentColor" />
+                    </div>
+                    <p className="text-slate-600 text-sm font-medium tracking-wide">Paste a YouTube link above to begin</p>
+                  </div>
                 )}
               </div>
             </div>

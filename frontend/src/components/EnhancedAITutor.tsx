@@ -1,8 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Zap, FlaskConical, Microscope, Sigma, BookOpen, Image as ImageIcon, 
-  Bookmark, Mic, Send, Loader2
-} from 'lucide-react';
+import { Send, Loader2, Bot, User } from 'lucide-react';
 import Layout from './Layout';
 
 type Message = {
@@ -14,26 +11,27 @@ type Message = {
   exam_tip?: string;
 };
 
+const QUICK_PROMPTS = [
+  "Explain Newton's 3rd law",
+  "What is Hess's law?",
+  "Differentiate log(x)",
+  "What is Le Chatelier's principle?",
+];
+
 export default function EnhancedAITutor() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'init',
       role: 'ai',
-      explanation: "Hello! I am your JARVIS AI Tutor. What concept would you like me to explain today?",
-      hint: "I specialize in JEE/NEET subjects.",
-      exam_tip: "Ask me specific questions or drop a topic name."
+      explanation: "Hi! I'm your JARVIS AI Tutor. Ask me anything about Physics, Chemistry, or Mathematics.",
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
   const handleSend = async (question: string = input) => {
@@ -51,21 +49,21 @@ export default function EnhancedAITutor() {
         body: JSON.stringify({ question })
       });
       const data = await res.json();
-      
-      const aiMessage: Message = {
+      const payload = data.data || data;
+
+      setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        explanation: data.explanation,
-        hint: data.hint,
-        exam_tip: data.exam_tip
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-       setMessages(prev => [...prev, {
-         id: (Date.now() + 1).toString(),
-         role: 'ai',
-         explanation: "Failed to connect to the AI engine. Please check if the server is running."
-       }]);
+        explanation: payload.explanation,
+        hint: payload.hint,
+        exam_tip: payload.exam_tip
+      }]);
+    } catch {
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'ai',
+        explanation: 'Could not reach the AI engine. Please check if the server is running.'
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -73,105 +71,93 @@ export default function EnhancedAITutor() {
 
   return (
     <Layout>
-      <div className="p-8 lg:p-12 max-w-6xl mx-auto w-full pb-48">
-        {/* Editorial Header */}
-        <header className="mb-12">
-          <h2 className="text-4xl font-extrabold font-headline tracking-tight text-slate-900 dark:text-slate-50 mb-2">AI Tutor</h2>
-          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl font-body leading-relaxed">
-            Ask doubts and get accurate answers from trusted <span className="text-cyan-600 dark:text-cyan-400 font-semibold">JEE/NEET</span> resources including NCERT, HC Verma, and more.
-          </p>
-        </header>
+      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-6 pb-24">
 
+        {/* Header */}
+        <div className="mb-6 flex-shrink-0">
+          <h2 className="text-3xl font-extrabold font-headline tracking-tight text-slate-900 dark:text-slate-50">AI Tutor</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">JEE / NEET doubt solver powered by Gemini</p>
+        </div>
 
+        {/* Quick Prompts */}
+        {messages.length <= 1 && (
+          <div className="flex flex-wrap gap-2 mb-6 flex-shrink-0">
+            {QUICK_PROMPTS.map(q => (
+              <button
+                key={q}
+                onClick={() => handleSend(q)}
+                className="text-xs px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 hover:text-cyan-700 dark:hover:text-cyan-300 border border-slate-200 dark:border-slate-700 transition-colors font-medium"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {/* Chat Interface Area */}
-        <div className="max-w-4xl mx-auto space-y-8 mb-8 w-full">
-          {messages.map((msg, idx) => (
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto space-y-4 pb-4 pr-1" style={{ minHeight: 0 }}>
+          {messages.map(msg => (
             msg.role === 'user' ? (
-              <div key={msg.id} className="flex flex-col items-end animate-[fadeUp_0.3s_ease-out_forwards]">
-                <div className="bg-cyan-600 text-white px-6 py-4 rounded-2xl rounded-tr-none max-w-md shadow-lg">
-                  <p className="text-sm font-body leading-relaxed">{msg.content}</p>
+              <div key={msg.id} className="flex items-end justify-end gap-2">
+                <div className="bg-cyan-600 text-white px-4 py-3 rounded-2xl rounded-br-sm max-w-sm text-sm leading-relaxed shadow-sm">
+                  {msg.content}
+                </div>
+                <div className="w-7 h-7 rounded-full bg-cyan-600 flex items-center justify-center flex-shrink-0">
+                  <User className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
             ) : (
-              <div key={msg.id} className="flex flex-col items-start gap-4 animate-[fadeUp_0.3s_ease-out_forwards]">
-                <div className="w-full bg-white dark:bg-slate-900 rounded-lg p-8 shadow-sm ring-1 ring-slate-200 dark:ring-slate-800">
-                  {/* Concept Badge */}
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Tutor Response</div>
-                    <span className="font-headline font-bold text-slate-900 dark:text-slate-50">Explanation</span>
-                  </div>
-
-                  {/* Main Explanation */}
-                  <div className="space-y-6 text-slate-900 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-                    <p className="text-sm">{msg.explanation}</p>
-                    
-                    {msg.hint && (
-                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl">
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-tight">Hint / Core Rule</p>
-                        <p className="text-sm text-slate-900 dark:text-slate-200">{msg.hint}</p>
-                      </div>
-                    )}
-                    
-                    {msg.exam_tip && (
-                      <div className="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 italic">
-                          <BookOpen className="w-4 h-4 text-sm shrink-0" />
-                          Exam Tip
-                        </div>
-                        <div className="flex items-center gap-1 text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase text-right">
-                          {msg.exam_tip}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+              <div key={msg.id} className="flex items-start gap-2">
+                <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center flex-shrink-0 mt-1">
+                  <Bot className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                </div>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-bl-sm px-5 py-4 max-w-2xl shadow-sm">
+                  <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+                    {msg.explanation}
+                  </p>
                 </div>
               </div>
             )
           ))}
+
           {isLoading && (
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-medium p-4 animate-pulse">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Thinking...
+            <div className="flex items-start gap-2">
+              <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center flex-shrink-0 mt-1">
+                <Bot className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-bl-sm px-5 py-4 shadow-sm">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </div>
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Section (Fixed Bottom Sticky) */}
-        <div className="fixed bottom-0 left-0 md:left-64 right-0 p-4 md:p-8 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 z-40">
-          <div className="max-w-4xl mx-auto">
-            {/* Input Field Container */}
-            <div className="relative group">
-              <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-700 px-6 py-4 shadow-sm transition-all group-focus-within:border-cyan-500 dark:group-focus-within:border-cyan-500">
-                <input 
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-body outline-none" 
-                  placeholder="Ask your doubt (e.g., Explain work-energy theorem)" 
-                  type="text"
-                />
-                <div className="flex items-center gap-4">
-                  <label className="text-slate-400 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors cursor-pointer" title="Upload Image">
-                    <input type="file" accept="image/*" className="hidden" />
-                    <ImageIcon className="w-5 h-5" />
-                  </label>
-                  <button className="text-slate-400 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors cursor-pointer" title="Voice Input">
-                    <Mic className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => handleSend()}
-                    disabled={isLoading || !input.trim()}
-                    className="w-10 h-10 rounded-full bg-cyan-600 text-white disabled:opacity-50 flex items-center justify-center transition-transform active:scale-95 cursor-pointer shadow-md hover:shadow-lg"
-                  >
-                    <Send className="w-5 h-5 ml-1" />
-                  </button>
-                </div>
-              </div>
-            </div>
+        {/* Input Bar — fixed to bottom, respects sidebar */}
+        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-4 py-3">
+          <div className="max-w-4xl mx-auto flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-sm focus-within:border-cyan-500 dark:focus-within:border-cyan-500 transition-colors">
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+              className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+              placeholder="Ask a doubt (e.g. Explain work-energy theorem)…"
+              type="text"
+            />
+            <button
+              onClick={() => handleSend()}
+              disabled={isLoading || !input.trim()}
+              className="w-8 h-8 rounded-full bg-cyan-600 text-white disabled:opacity-40 flex items-center justify-center transition-all active:scale-90 hover:bg-cyan-700 flex-shrink-0"
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
           </div>
         </div>
+
       </div>
     </Layout>
   );
