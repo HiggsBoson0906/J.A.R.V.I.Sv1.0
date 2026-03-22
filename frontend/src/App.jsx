@@ -8,6 +8,7 @@ import Resources from './components/Resources';
 import ProfileSettings from './components/ProfileSettings';
 import VideoProcessor from './components/VideoProcessor';
 import EnhancedAITutor from './components/EnhancedAITutor';
+import AdaptivePracticeDashboard from './components/AdaptivePracticeDashboard';
 import { TimerProvider } from './components/TimerContext';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/resources" element={<Resources />} />
           <Route path="/ai-tutor" element={<EnhancedAITutor />} />
           <Route path="/video-processor" element={<VideoProcessor />} />
+          <Route path="/practice" element={<AdaptivePracticeDashboard />} />
           <Route path="/profile" element={<ProfileSettings />} />
         </Routes>
       </BrowserRouter>
