@@ -82,29 +82,7 @@ export default function EnhancedAITutor() {
           </p>
         </header>
 
-        {/* Subject Selection Bento */}
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          <button className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-lg border-b-4 border-indigo-600 shadow-sm transition-all hover:-translate-y-1">
-            <Zap className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-3" />
-            <span className="font-headline font-bold text-slate-900 dark:text-slate-100 text-lg">Physics</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">H.C. Verma, Irodov</span>
-          </button>
-          <button className="flex flex-col p-6 bg-slate-50 dark:bg-slate-800 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-700">
-            <FlaskConical className="w-6 h-6 text-slate-500 dark:text-slate-400 mb-3" />
-            <span className="font-headline font-bold text-slate-900 dark:text-slate-100 text-lg">Chemistry</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">MS Chauhan, N Awasthi</span>
-          </button>
-          <button className="flex flex-col p-6 bg-slate-50 dark:bg-slate-800 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-700">
-            <Microscope className="w-6 h-6 text-slate-500 dark:text-slate-400 mb-3" />
-            <span className="font-headline font-bold text-slate-900 dark:text-slate-100 text-lg">Biology</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">NCERT, Trueman</span>
-          </button>
-          <button className="flex flex-col p-6 bg-slate-50 dark:bg-slate-800 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-700">
-            <Sigma className="w-6 h-6 text-slate-500 dark:text-slate-400 mb-3" />
-            <span className="font-headline font-bold text-slate-900 dark:text-slate-100 text-lg">Mathematics</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Cengage, RD Sharma</span>
-          </button>
-        </section>
+
 
         {/* Chat Interface Area */}
         <div className="max-w-4xl mx-auto space-y-8 mb-8 w-full">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart2, Bell, BookOpen, Calendar, Check, Clock, Home, Search, Send, Timer, User, Moon, Sun, X, Film, Bot } from 'lucide-react';
+import { BarChart2, Bell, BookOpen, Calendar, Check, Clock, Home, Search, Send, Timer, User, Moon, Sun, X, Film, Bot, Target } from 'lucide-react';
 import { useTimer } from './TimerContext';
 
 const DUMMY_NOTIFICATIONS = [
@@ -110,6 +110,7 @@ export default function Layout({ children }) {
           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+          <NavLinkItem to="/practice" icon={<Target className="w-5 h-5"/>} label="Practice" />
         </nav>
         <Link to="/profile" className="mt-auto p-4 bg-white dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group block border border-slate-200 dark:border-slate-700/50 shadow-sm">
           <div className="flex items-center gap-3">
