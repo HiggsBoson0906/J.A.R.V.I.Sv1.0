@@ -24,6 +24,7 @@ async function initDB() {
         CREATE TABLE IF NOT EXISTS performance (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
+            subject_name TEXT NOT NULL,
             topic_name TEXT NOT NULL,
             accuracy INTEGER DEFAULT 0,
             questions_attempted INTEGER DEFAULT 0,
@@ -31,9 +32,15 @@ async function initDB() {
             last_studied DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
+        CREATE TABLE IF NOT EXISTS syllabus (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject_name TEXT NOT NULL,
+            topic_name TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS study_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
+            subject_name TEXT NOT NULL,
             topic TEXT NOT NULL,
             duration INTEGER DEFAULT 0,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,

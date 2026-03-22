@@ -17,5 +17,6 @@ router.post('/suggest-goals', plannerController.suggestGoals);
 router.get('/planner', plannerController.getPlanner);
 router.get('/performance', dashboardController.getPerformance);
 router.post('/process-video', videoController.processVideo);
+router.post('/sync-plan', dashboardController.syncPlan);
 
 module.exports = router;

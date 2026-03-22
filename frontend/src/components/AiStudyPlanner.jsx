@@ -25,29 +25,14 @@ const StylishSelect = ({ value, onChange, options, className }) => (
   </div>
 );
 
-const TimeBlockEditor = ({ timeStr, onChange }) => {
-    const clean = timeStr.replace(/AM|PM/g, '').trim(); 
-    const isPM = timeStr.includes("PM");
-    
-    // Safely parse formats like "09:00 AM - 10:30 AM" or "09:00 - 10:30"
-    const parts = clean.includes("-") ? clean.split("-").map(p => p.trim()) : ["09:00", "10:30"];
-    const startTime = parts[0] || "09:00";
-    const endTime = parts[1] || "10:30";
-    const meridian = isPM ? "PM" : "AM";
-
-    const update = (st, et, mer) => onChange(`${st} - ${et} ${mer}`);
-
-    const timeOptions = ["01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"];
-
-    return (
-       <div className="flex items-center gap-2 mt-2 w-full flex-wrap">
-          <StylishSelect value={startTime} onChange={e => update(e.target.value, endTime, meridian)} options={timeOptions} className="w-24" />
-          <span className="text-slate-400 font-medium">-</span>
-          <StylishSelect value={endTime} onChange={e => update(startTime, e.target.value, meridian)} options={timeOptions} className="w-24" />
-          <StylishSelect value={meridian} onChange={e => update(startTime, endTime, e.target.value)} options={["AM", "PM"]} className="w-20" />
-       </div>
-    );
-};
+const TimeBlockEditor = ({ timeStr, onChange }) => (
+    <input 
+      type="text" 
+      value={timeStr} 
+      onChange={e => onChange(e.target.value)} 
+      className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold text-cyan-600 dark:text-cyan-400 py-1 px-3 rounded text-center outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all mt-2"
+    />
+);
 
 export default function AiStudyPlanner() {
   const [plannerTasks, setPlannerTasks] = useState([]);
@@ -64,12 +49,12 @@ export default function AiStudyPlanner() {
     fetch('http://localhost:3001/api/planner')
       .then(r => r.json())
       .then(d => { 
-          if (d.success && d.data.tomorrow_plan) {
-             const times = ["09:00 - 10:30 AM", "11:00 - 12:30 PM", "02:00 - 03:30 PM", "04:00 - 05:30 PM"];
-             const structuredTasks = d.data.tomorrow_plan.map((t, i) => ({
+          if (d.success && d.data.plan) {
+             const structuredTasks = d.data.plan.map((t, i) => ({
                  id: Date.now() + i,
-                 task: t,
-                 time: times[i % times.length]
+                 task: t.title,
+                 time: t.time,
+                 description: t.description
              }));
              setPlannerTasks(structuredTasks);
           }
@@ -83,15 +68,17 @@ export default function AiStudyPlanner() {
       const res = await fetch('http://localhost:3001/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ performance_data: selectedSubjects.map(s => ({ topic_name: s, accuracy: 50 })) })
+        body: JSON.stringify({ 
+           subjects: selectedSubjects
+        })
       });
       const data = await res.json();
-      if (data.success) {
-         const times = ["09:00 - 10:30 AM", "11:00 - 12:30 PM", "02:00 - 03:30 PM", "04:00 - 05:30 PM"];
-         const structuredTasks = data.data.tomorrow_plan.map((t, i) => ({
+      if (data.success && data.data.plan) {
+         const structuredTasks = data.data.plan.map((t, i) => ({
              id: Date.now() + i,
-             task: t,
-             time: times[i % times.length]
+             task: t.title,
+             time: t.time,
+             description: t.description
          }));
          setPlannerTasks(structuredTasks);
       }
@@ -125,6 +112,19 @@ export default function AiStudyPlanner() {
   
   const deleteTask = (id) => {
       setPlannerTasks(plannerTasks.filter(t => t.id !== id));
+  };
+
+  const handleSync = async () => {
+    try {
+      const res = await fetch('http://localhost:3001/api/sync-plan', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ plan: plannerTasks })
+      });
+      if (res.ok) {
+         window.location.href = '/';
+      }
+    } catch(e) { console.error(e); }
   };
 
   return (
@@ -175,22 +175,7 @@ export default function AiStudyPlanner() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block font-label text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Focus Areas</label>
-                  <div className="relative">
-                    <textarea className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-sm focus:ring-2 focus:ring-cyan-500/20 outline-none text-slate-900 dark:text-slate-50" placeholder="e.g. Thermodynamics, Organic Synthesis" rows="3"></textarea>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="block font-label text-xs font-bold text-slate-500 uppercase tracking-wider">Daily Study Hours</label>
-                    <span className="text-cyan-600 dark:text-cyan-400 font-bold">6.5 hrs</span>
-                  </div>
-                  <input className="w-full h-2 bg-cyan-100 dark:bg-cyan-900/50 rounded-full appearance-none cursor-pointer accent-cyan-600" max="12" min="1" step="0.5" type="range" defaultValue="6.5" aria-label="Study hours"/>
-                </div>
-
-                <button onClick={handleGenerate} disabled={loading} className="w-full py-4 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/30 hover:shadow-cyan-600/50 active:scale-95 transition-all">
+                <button onClick={handleGenerate} disabled={loading} className="w-full py-4 mt-6 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/30 hover:shadow-cyan-600/50 active:scale-95 transition-all">
                   <Sparkles className={`text-xl ${loading ? 'animate-spin' : ''}`} />
                   {loading ? 'Processing...' : 'Generate AI Plan'}
                 </button>
@@ -249,7 +234,7 @@ export default function AiStudyPlanner() {
                           ) : (
                             <h4 className="text-lg font-bold text-slate-900 dark:text-slate-200 mb-1">{task.task}</h4>
                           )}
-                          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Time boxed session configured dynamically.</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{task.description || "Time boxed session configured dynamically."}</p>
                         </div>
                         
                         <div className="flex flex-col gap-2">
@@ -288,7 +273,7 @@ export default function AiStudyPlanner() {
                 </div>
                 <div className="flex gap-4">
                   <button className="text-cyan-600 dark:text-cyan-400 font-bold text-sm px-6 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer">Discard Draft</button>
-                  <button onClick={() => alert("Calendar Sync Triggered! (Demo functionality)")} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg shadow-cyan-600/30 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">Accept &amp; Sync to Calendar</button>
+                  <button onClick={handleSync} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg shadow-cyan-600/30 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">Accept &amp; Sync to Calendar</button>
                 </div>
               </div>
             </div>

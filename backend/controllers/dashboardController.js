@@ -1,6 +1,13 @@
 const { getDB } = require('../db/database');
 const { getStatus, sendJSON, sendError } = require('../utils/helpers');
 
+let currentSyncedPlan = null;
+
+exports.syncPlan = (req, res) => {
+    currentSyncedPlan = req.body.plan;
+    return sendJSON(res, { success: true });
+};
+
 exports.getDashboard = async (req, res) => {
     try {
         const db = await getDB();
@@ -17,7 +24,11 @@ exports.getDashboard = async (req, res) => {
             status: getStatus(p.accuracy)
         })).filter(t => t.status === 'Weak');
 
-        const today_plan = weak_topics.slice(0, 3).map(t => `Revise foundational concepts in ${t.topic_name}`);
+        let today_plan = weak_topics.slice(0, 3).map(t => `Revise foundational concepts in ${t.topic_name}`);
+        
+        if (currentSyncedPlan && currentSyncedPlan.length > 0) {
+            today_plan = currentSyncedPlan.map(t => `${t.time.split(' - ')[0]} | ${t.task}`);
+        }
 
         sendJSON(res, {
             user_name: user.name,

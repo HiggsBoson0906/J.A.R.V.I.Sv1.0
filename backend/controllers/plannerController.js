@@ -3,25 +3,70 @@ const { sendJSON, sendError, getStatus } = require('../utils/helpers');
 
 exports.generatePlan = async (req, res) => {
     try {
-        const { performance_data } = req.body;
-        if (!performance_data || !Array.isArray(performance_data) || performance_data.length === 0) {
-            return sendJSON(res, { tomorrow_plan: [] });
+        const { subjects } = req.body;
+        
+        if (!subjects || subjects.length === 0) {
+             return res.json({ success: true, data: { plan: [] } });
         }
 
-        const plan = performance_data.map(p => {
-            const stat = getStatus(p.accuracy);
-            if (stat === "Weak") return `Revision Block: Deep dive into ${p.topic_name}`;
-            if (stat === "Moderate") return `Active Practice: Solve 20 questions on ${p.topic_name}`;
-            return `Light Review: Quick quiz on ${p.topic_name}`;
+        const db = await getDB();
+        const plan = [];
+
+        // For each subject, grab exactly 1 revision (lowest accuracy) and 1 new topic (from syllabus not in performance)
+        for (const subject of subjects) {
+            // 1. Revision Topic (from performance, weak first)
+            const revStmt = await db.get(
+                'SELECT topic_name, accuracy FROM performance WHERE subject_name = ? ORDER BY accuracy ASC LIMIT 1', 
+                [subject]
+            );
+
+            if (revStmt) {
+                plan.push({
+                   subject: subject,
+                   topic: revStmt.topic_name,
+                   type: 'Revision'
+                });
+            }
+
+            // 2. New Topic (from syllabus, not in performance)
+            const newStmt = await db.get(`
+                SELECT topic_name FROM syllabus 
+                WHERE subject_name = ? 
+                AND topic_name NOT IN (SELECT topic_name FROM performance WHERE subject_name = ?) 
+                LIMIT 1
+            `, [subject, subject]);
+
+            if (newStmt) {
+                plan.push({
+                   subject: subject,
+                   topic: newStmt.topic_name,
+                   type: 'New Study'
+                });
+            }
+        }
+
+        const structuredPlan = plan.map((p, i) => {
+            const typeLabel = p.type === 'Revision' ? 'Revision Focus' : 'Deep Study';
+            const desc = p.type === 'Revision' 
+                ? 'Review weak concepts and solve advanced practice problems targeting historical bottlenecks.' 
+                : 'Cover new theoretical concepts and build foundational problem solving intuition.';
+
+            return {
+                time: `90 mins`,
+                title: `${p.subject} | ${typeLabel}: ${p.topic}`,
+                description: desc
+            };
         });
 
-        sendJSON(res, { tomorrow_plan: plan });
+        return res.json({ success: true, data: { plan: structuredPlan } });
+
     } catch (e) {
-        sendError(res, e.message, 500);
+        console.error("Generate Plan Error:", e);
+        return res.json({ success: false, message: 'Internal Server Error' });
     }
 };
 
-exports.suggestGoals = exports.generatePlan; // Identical logic structure
+exports.suggestGoals = exports.generatePlan;  // Identical logic structure
 
 exports.getPlanner = async (req, res) => {
     try {
