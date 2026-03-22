@@ -108,7 +108,6 @@ export default function Layout({ children }) {
           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
-          <NavLinkItem to="/resources" icon={<BookOpen className="w-5 h-5"/>} label="Resources" />
           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
         </nav>
