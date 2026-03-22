@@ -5,6 +5,7 @@ const plannerController = require('../controllers/plannerController');
 const topicController = require('../controllers/topicController');
 const aiController = require('../controllers/aiController');
 const sessionController = require('../controllers/sessionController');
+const videoController = require('../controllers/videoController');
 
 router.get('/dashboard', dashboardController.getDashboard);
 router.post('/generate-plan', plannerController.generatePlan);
@@ -15,5 +16,6 @@ router.post('/study-session', sessionController.recordSession);
 router.post('/suggest-goals', plannerController.suggestGoals);
 router.get('/planner', plannerController.getPlanner);
 router.get('/performance', dashboardController.getPerformance);
+router.post('/process-video', videoController.processVideo);
 
 module.exports = router;
