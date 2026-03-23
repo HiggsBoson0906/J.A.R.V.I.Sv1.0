@@ -104,7 +104,7 @@ export default function Layout({ children }) {
           </div>
         </div>
         <nav className="flex-1 space-y-2">
-          <NavLinkItem to="/" icon={<Home className="w-5 h-5"/>} label="Home" />
+          <NavLinkItem to="/dashboard" icon={<Home className="w-5 h-5"/>} label="Home" />
           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />

@@ -8,6 +8,8 @@ import ProfileSettings from './components/ProfileSettings';
 import VideoProcessor from './components/VideoProcessor';
 import EnhancedAITutor from './components/EnhancedAITutor';
 import AdaptivePracticeDashboard from './components/AdaptivePracticeDashboard.jsx';
+import AuraAILandingPage from './components/AuraAILandingPage.tsx';
+import AuraAIAuth from './components/AuraAIAuth.tsx';
 import { TimerProvider } from './components/TimerContext';
 
 function App() {
@@ -15,7 +17,9 @@ function App() {
     <TimerProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomeDashboard />} />
+          <Route path="/" element={<AuraAILandingPage />} />
+          <Route path="/auth" element={<AuraAIAuth />} />
+          <Route path="/dashboard" element={<HomeDashboard />} />
           <Route path="/planner" element={<AiStudyPlanner />} />
           <Route path="/timer" element={<FocusTimer />} />
           <Route path="/performance" element={<PerformanceInsights />} />

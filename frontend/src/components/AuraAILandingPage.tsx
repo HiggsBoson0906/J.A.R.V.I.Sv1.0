@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   UserCircle, 
   Bot, 
@@ -17,6 +18,8 @@ import {
 } from 'lucide-react';
 
 export default function AuraAILandingPage() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Scroll Reveal Script
     const observerOptions = {
@@ -101,7 +104,7 @@ export default function AuraAILandingPage() {
           <a className="text-slate-600 hover:text-indigo-500 transition-colors font-label text-[0.75rem] tracking-widest uppercase font-medium" href="#">Laboratory</a>
         </div>
         <div className="flex items-center gap-4">
-          <button className="px-6 py-2 bg-primary text-white rounded-full font-label text-[0.75rem] tracking-widest uppercase font-bold hover:scale-105 transition-all shadow-lg shadow-primary/20">
+          <button onClick={() => navigate('/auth')} className="px-6 py-2 bg-primary text-white rounded-full font-label text-[0.75rem] tracking-widest uppercase font-bold hover:scale-105 transition-all shadow-lg shadow-primary/20">
             Initialize AI
           </button>
           <UserCircle className="text-on-surface-variant cursor-pointer hover:text-primary transition-colors" size={24} />
@@ -132,10 +135,10 @@ export default function AuraAILandingPage() {
               Adaptive practice, AI tutor, and personalized study plans specifically engineered for JEE and NEET aspirants.
             </p>
             <div className="mt-12 flex flex-col md:flex-row gap-6">
-              <button className="px-10 py-5 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-headline text-lg font-bold shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+              <button onClick={() => navigate('/auth')} className="px-10 py-5 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-headline text-lg font-bold shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
                 Start Practice
               </button>
-              <button className="px-10 py-5 bg-surface-container-high text-on-surface rounded-full font-headline text-lg font-bold hover:bg-surface-variant transition-all flex items-center gap-2">
+              <button onClick={() => navigate('/auth')} className="px-10 py-5 bg-surface-container-high text-on-surface rounded-full font-headline text-lg font-bold hover:bg-surface-variant transition-all flex items-center gap-2">
                 Try AI Tutor
                 <Bot />
               </button>
@@ -425,7 +428,7 @@ export default function AuraAILandingPage() {
               <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[100px]"></div>
               <h2 className="text-4xl md:text-6xl font-syne font-extrabold mb-8 shimmer-text" style={{ backgroundImage: "linear-gradient(90deg, #ffffff 0%, #dad7ff 50%, #ffffff 100%)" }}>Start Your Preparation Today</h2>
               <p className="max-w-2xl mx-auto text-on-primary-container text-lg md:text-xl mb-12">Join 50,000+ students leveraging AURA AI to achieve their academic goals.</p>
-              <button className="px-12 py-6 bg-white text-primary rounded-full font-headline text-xl font-black hover:scale-105 transition-all shadow-2xl hover:shadow-white/20">
+              <button onClick={() => navigate('/auth')} className="px-12 py-6 bg-white text-primary rounded-full font-headline text-xl font-black hover:scale-105 transition-all shadow-2xl hover:shadow-white/20">
                   Get Started Free
               </button>
             </div>
