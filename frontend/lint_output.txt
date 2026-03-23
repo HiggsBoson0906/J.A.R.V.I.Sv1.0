@@ -1,0 +1,485 @@
+
+> temp_front@0.0.0 lint
+> eslint .
+
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\AdaptivePracticeDashboard.jsx
+   28:6  warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/exhaustive-deps
+  228:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  226 |
+  227 |   useEffect(() => {
+> 228 |     setLoading(true);
+      |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  229 |     fetch(`${API}/practice/questions`, {
+  230 |       method: 'POST',
+  231 |       headers: {   react-hooks/set-state-in-effect
+  244:6  warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/exhaustive-deps
+  393:6  warning  React Hook useEffect has missing dependencies: 'answersArray', 'subject', 'topic', and 'user.userId'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\AiStudyPlanner.jsx
+   64:6   warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  212:43  error    'idx' is defined but never used                                                                                 no-unused-vars
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\HomeDashboard.jsx
+   35:6  warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  108:9  error    'timeMgmt' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                        no-unused-vars
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\Layout.jsx
+   22:10  error  'aiOpen' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    no-unused-vars
+   22:18  error  'setAiOpen' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 no-unused-vars
+   23:22  error  'setAiQuestion' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+   24:10  error  'aiAnswer' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   25:10  error  'aiAsking' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   27:9   error  'handleAskDoubt' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+   57:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  55 |     if (saved === 'dark') document.documentElement.classList.add('dark');
+  56 |     
+> 57 |     setIsDark(document.documentElement.classList.contains('dark'));
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  58 |   }, []);
+  59 |
+  60 |   const toggleTheme = () => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/set-state-in-effect
+  112:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  110 |         </div>
+  111 |         <nav className="flex-1 space-y-2">
+> 112 |           <NavLinkItem to="/dashboard" icon={<Home className="w-5 h-5"/>} label="Home" />
+      |            ^^^^^^^^^^^ This component is created during render
+  113 |           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
+  114 |           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
+  115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                                                                                                                                                                              react-hooks/static-components
+  113:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  111 |         <nav className="flex-1 space-y-2">
+  112 |           <NavLinkItem to="/dashboard" icon={<Home className="w-5 h-5"/>} label="Home" />
+> 113 |           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
+      |            ^^^^^^^^^^^ This component is created during render
+  114 |           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
+  115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+  116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                                                                                                 react-hooks/static-components
+  114:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  112 |           <NavLinkItem to="/dashboard" icon={<Home className="w-5 h-5"/>} label="Home" />
+  113 |           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
+> 114 |           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
+      |            ^^^^^^^^^^^ This component is created during render
+  115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+  116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+  117 |           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                                 react-hooks/static-components
+  115:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  113 |           <NavLinkItem to="/planner" icon={<Calendar className="w-5 h-5"/>} label="Planner" />
+  114 |           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
+> 115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+      |            ^^^^^^^^^^^ This component is created during render
+  116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+  117 |           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+  118 |           <NavLinkItem to="/practice" icon={<Target className="w-5 h-5"/>} label="Practice" />
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                            react-hooks/static-components
+  116:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  114 |           <NavLinkItem to="/timer" icon={<Timer className="w-5 h-5"/>} label="Timer" />
+  115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+> 116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+      |            ^^^^^^^^^^^ This component is created during render
+  117 |           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+  118 |           <NavLinkItem to="/practice" icon={<Target className="w-5 h-5"/>} label="Practice" />
+  119 |         </nav>
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                                                                                                            react-hooks/static-components
+  117:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  115 |           <NavLinkItem to="/performance" icon={<BarChart2 className="w-5 h-5"/>} label="Performance" />
+  116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+> 117 |           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+      |            ^^^^^^^^^^^ This component is created during render
+  118 |           <NavLinkItem to="/practice" icon={<Target className="w-5 h-5"/>} label="Practice" />
+  119 |         </nav>
+  120 |         <Link to="/profile" className="mt-auto p-4 bg-white dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group block border border-slate-200 dark:border-slate-700/50 shadow-sm">
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">  react-hooks/static-components
+  118:12  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  116 |           <NavLinkItem to="/ai-tutor" icon={<Bot className="w-5 h-5"/>} label="AI Tutor" />
+  117 |           <NavLinkItem to="/video-processor" icon={<Film className="w-5 h-5"/>} label="Video Processor" />
+> 118 |           <NavLinkItem to="/practice" icon={<Target className="w-5 h-5"/>} label="Practice" />
+      |            ^^^^^^^^^^^ This component is created during render
+  119 |         </nav>
+  120 |         <Link to="/profile" className="mt-auto p-4 bg-white dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group block border border-slate-200 dark:border-slate-700/50 shadow-sm">
+  121 |           <div className="flex items-center gap-3">
+
+  66 |   };
+  67 |
+> 68 |   const NavLinkItem = ({ to, icon, label }) => {
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |     const active = location.pathname === to;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     return (
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |       <Link to={to} className={`flex items-center gap-3 px-4 py-3 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors rounded-xl ${active ? 'text-cyan-700 dark:text-cyan-400 font-bold bg-white dark:bg-slate-800 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 72 |         {icon}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         <span className="text-sm font-label">{label}</span>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |       </Link>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |   };
+     | ^^^^ The component is created during render here
+  77 |
+  78 |   return (
+  79 |     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 min-h-screen font-body">                                                      react-hooks/static-components
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\PerformanceInsights.jsx
+  20:6  warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\ProfileSettings.jsx
+  149:20  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  147 |                 </div>
+  148 |                 <div className="space-y-3">
+> 149 |                   <Field icon={<User className="w-4 h-4"/>} label="Full Name" fieldKey="name" />
+      |                    ^^^^^ This component is created during render
+  150 |                   <Field icon={<Mail className="w-4 h-4"/>} label="Email Address" fieldKey="email" type="email" />
+  151 |                   <Field icon={<Target className="w-4 h-4"/>} label="Target Exam" fieldKey="targetExam" isSelect />
+  152 |                 </div>
+
+  36 |   };
+  37 |
+> 38 |   const Field = ({ icon, label, fieldKey, type = 'text', isSelect }) => (
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |     <div className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |       <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5">
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |   );
+     | ^^^^ The component is created during render here
+  72 |
+  73 |   return (
+  74 |     <Layout>  react-hooks/static-components
+  150:20  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  148 |                 <div className="space-y-3">
+  149 |                   <Field icon={<User className="w-4 h-4"/>} label="Full Name" fieldKey="name" />
+> 150 |                   <Field icon={<Mail className="w-4 h-4"/>} label="Email Address" fieldKey="email" type="email" />
+      |                    ^^^^^ This component is created during render
+  151 |                   <Field icon={<Target className="w-4 h-4"/>} label="Target Exam" fieldKey="targetExam" isSelect />
+  152 |                 </div>
+  153 |               </div>
+
+  36 |   };
+  37 |
+> 38 |   const Field = ({ icon, label, fieldKey, type = 'text', isSelect }) => (
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |     <div className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |       <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5">
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |   );
+     | ^^^^ The component is created during render here
+  72 |
+  73 |   return (
+  74 |     <Layout>    react-hooks/static-components
+  151:20  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  149 |                   <Field icon={<User className="w-4 h-4"/>} label="Full Name" fieldKey="name" />
+  150 |                   <Field icon={<Mail className="w-4 h-4"/>} label="Email Address" fieldKey="email" type="email" />
+> 151 |                   <Field icon={<Target className="w-4 h-4"/>} label="Target Exam" fieldKey="targetExam" isSelect />
+      |                    ^^^^^ This component is created during render
+  152 |                 </div>
+  153 |               </div>
+  154 |             </div>
+
+  36 |   };
+  37 |
+> 38 |   const Field = ({ icon, label, fieldKey, type = 'text', isSelect }) => (
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |     <div className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |       <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5">
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |   );
+     | ^^^^ The component is created during render here
+  72 |
+  73 |   return (
+  74 |     <Layout>                             react-hooks/static-components
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\SplashCursor.jsx
+  145:5  warning  Compilation Skipped: Inline `class` declarations are not supported
+
+Move class declarations outside of components/hooks.
+
+  143 |     }
+  144 |
+> 145 |     class Material {
+      |     ^^^^^^^^^^^^^^^^
+> 146 |       constructor(vertexShader, fragmentShaderSource) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 147 |         this.vertexShader = vertexShader;
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 168 |       }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 169 |     }
+      | ^^^^^^ Inline `class` declarations are not supported
+  170 |
+  171 |     class Program {
+  172 |       constructor(vertexShader, fragmentShader) {
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/unsupported-syntax
+  171:5  warning  Compilation Skipped: Inline `class` declarations are not supported
+
+Move class declarations outside of components/hooks.
+
+  169 |     }
+  170 |
+> 171 |     class Program {
+      |     ^^^^^^^^^^^^^^^
+> 172 |       constructor(vertexShader, fragmentShader) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 173 |         this.uniforms = {};
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 174 |         this.program = createProgram(vertexShader, fragmentShader);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |         this.uniforms = getUniforms(this.program);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 176 |       }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 177 |       bind() {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 178 |         gl.useProgram(this.program);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 179 |       }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 180 |     }
+      | ^^^^^^ Inline `class` declarations are not supported
+  181 |
+  182 |     function createProgram(vertexShader, fragmentShader) {
+  183 |       let program = gl.createProgram();
+
+  react-hooks/unsupported-syntax
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\TimerContext.jsx
+  33:17  error    Error: Cannot access variable before it is declared
+
+`resetTimer` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  31 |                 setSessionSavedTick(t => t+1);
+  32 |                 alert("Session Finished & Saved successfully!");
+> 33 |                 resetTimer(parseInt(mode));
+     |                 ^^^^^^^^^^ `resetTimer` accessed before it is declared
+  34 |             })
+  35 |             .catch(console.error);
+  36 |         }
+
+  40 |     const toggleTimer = () => setIsActive(!isActive);
+  41 |     
+> 42 |     const resetTimer = (mins) => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |         setIsActive(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |         setMode(mins.toString());
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |         setTimeLeft(mins * 60);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |     };
+     | ^^^^^^^ `resetTimer` is declared here
+  47 |
+  48 |     const handleSaveSessionManually = () => {
+  49 |          setIsActive(false);  react-hooks/immutability
+  38:8   warning  React Hook useEffect has a missing dependency: 'user.userId'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  82:14  error    Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-refresh/only-export-components
+
+C:\Users\HP\jarwase\boom\J.A.R.V.I.Sv1.0\frontend\src\components\VideoProcessor.jsx
+  20:57   error  'observer' is defined but never used                                                          no-unused-vars
+  57:14   error  'err' is defined but never used                                                               no-unused-vars
+  65:53   error  Unnecessary escape character: \/                                                              no-useless-escape
+  65:111  error  Unnecessary escape character: \/                                                              no-useless-escape
+  70:9    error  'thumbnailUrl' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 36 problems (27 errors, 9 warnings)
+
