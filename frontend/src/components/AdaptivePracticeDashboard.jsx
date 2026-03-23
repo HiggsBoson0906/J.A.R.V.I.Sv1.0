@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import { ChevronRight, RotateCcw, ArrowLeft, CheckCircle, XCircle, Target, Beaker, BookOpen, Calculator, Flame, Award, Zap, ChevronLeft } from 'lucide-react';
 
-const API = import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}`;
+const API = import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}`;
 
 function AccuracyBadge({ accuracy }) {
   if (accuracy === null || accuracy === undefined) {

@@ -28,7 +28,7 @@ export default function Layout({ children }) {
     if (!aiQuestion.trim()) return;
     setAiAsking(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/ask-doubt`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/ask-doubt`, {
         method: 'POST', 
         headers: {
           'Content-Type': 'application/json',

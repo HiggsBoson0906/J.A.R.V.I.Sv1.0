@@ -8,12 +8,12 @@ export default function PerformanceInsights() {
   const [dashData, setDashData] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
+    fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error(e));
 
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
+    fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setDashData(d.data); })
       .catch(e => console.error("Error fetching dashboard", e));
