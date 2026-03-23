@@ -1,4 +1,4 @@
-const { getDB } = require('../db/database');
+const { getPrimaryDB: getDB } = require('../db/connection');
 const { sendJSON, sendError } = require('../utils/helpers');
 
 exports.recordSession = async (req, res) => {

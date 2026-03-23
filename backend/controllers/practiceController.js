@@ -1,6 +1,6 @@
 const { sendJSON, sendError } = require('../utils/helpers');
 const { GoogleGenAI } = require('@google/genai');
-const { getDB } = require('../db/database');
+const { getPrimaryDB: getDB } = require('../db/connection');
 
 // ─── GET /practice/subjects ───────────────────────────────────────────────────
 exports.getSubjects = async (req, res) => {

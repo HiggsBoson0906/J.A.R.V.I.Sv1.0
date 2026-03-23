@@ -1,4 +1,4 @@
-const { getDB } = require('../db/database');
+const { getPrimaryDB: getDB } = require('../db/connection');
 
 // Signup
 exports.signup = async (req, res) => {

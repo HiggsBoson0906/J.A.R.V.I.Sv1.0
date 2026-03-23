@@ -1,4 +1,4 @@
-const { getDB } = require('../db/database');
+const { getPrimaryDB: getDB } = require('../db/connection');
 const { getStatus, sendJSON, sendError } = require('../utils/helpers');
 
 let currentSyncedPlan = null;
@@ -81,6 +81,27 @@ exports.getPerformance = async (req, res) => {
                 streak: userStats.streak
             },
             focus_hours
+        });
+    } catch (e) {
+        sendError(res, e.message, 500);
+    }
+};
+
+exports.getProfileStats = async (req, res) => {
+    try {
+        const userId = req.headers['x-user-id'];
+        if (!userId) return sendJSON(res, { total_focus: 0, total_tests: 0, highest_accuracy: 0, lowest_accuracy: 0 });
+
+        const db = await getDB();
+        
+        const sessions = await db.get('SELECT SUM(duration) as total_min FROM study_sessions WHERE user_id = ?', [userId]);
+        const tests = await db.get('SELECT COUNT(*) as test_count, MAX(accuracy) as high_acc, MIN(accuracy) as low_acc FROM performance WHERE user_id = ?', [userId]);
+
+        sendJSON(res, {
+            total_focus: Math.round((sessions.total_min || 0) / 60),
+            total_tests: tests.test_count || 0,
+            highest_accuracy: tests.high_acc || 0,
+            lowest_accuracy: tests.low_acc || 0
         });
     } catch (e) {
         sendError(res, e.message, 500);

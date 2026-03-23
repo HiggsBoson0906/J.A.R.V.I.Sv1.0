@@ -1,4 +1,4 @@
-const { getDB } = require('../db/database');
+const { getPrimaryDB: getDB } = require('../db/connection');
 const { sendJSON, sendError, getStatus } = require('../utils/helpers');
 
 exports.generatePlan = async (req, res) => {
