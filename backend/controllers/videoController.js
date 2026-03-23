@@ -31,8 +31,38 @@ exports.processVideo = async (req, res) => {
             const { YoutubeTranscript } = await import('youtube-transcript/dist/youtube-transcript.esm.js');
             transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
         } catch (error) {
-            console.error("Transcript fetch error:", error);
-            return res.json({ success: false, message: 'Transcript not available' });
+            console.warn("Primary transcript fetch failed (possibly Render IP blocked). Falling back to Proxy...", error.message);
+            
+            // Backup Proxy Scraper Handler to circumvent Render's Datacenter 429 block
+            try {
+                const proxy = 'https://api.allorigins.win/raw?url=';
+                const ytUrl = encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`);
+                const htmlResponse = await fetch(proxy + ytUrl);
+                const html = await htmlResponse.text();
+                
+                const match = html.match(/ytInitialPlayerResponse\s*=\s*({.+?})\s*;/);
+                if (!match) throw new Error("Could not parse YouTube response through proxy");
+                
+                const playerResponse = JSON.parse(match[1]);
+                const tracks = playerResponse.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+                if (!tracks || !tracks.length) throw new Error("No captions attached to video");
+                
+                // Fetch the inner XML via proxy
+                const xmlResponse = await fetch(proxy + encodeURIComponent(tracks[0].baseUrl));
+                const xml = await xmlResponse.text();
+                
+                const textMatches = xml.match(/<text.*?>([^<]+)<\/text>/g) || [];
+                transcriptItems = textMatches.map(t => {
+                    const text = t.replace(/<text.*?>|<\/text>/g, '')
+                                  .replace(/&amp;/g, '&')
+                                  .replace(/&#39;/g, "'")
+                                  .replace(/&quot;/g, '"');
+                    return { text };
+                });
+            } catch (proxyError) {
+                console.error("Proxy transcript fallback also failed:", proxyError.message);
+                return res.json({ success: false, message: 'Transcript not available securely. Try local.' });
+            }
         }
 
         if (!transcriptItems || transcriptItems.length === 0) {

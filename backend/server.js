@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const dns = require('dns');
+
+// Force IPv4 as a mitigation step against Render's IPv6 YouTube blocking
+dns.setDefaultResultOrder('ipv4first');
 const { initDB, closeDB } = require('./db/connection');
 const apiRoutes = require('./routes/apiRoutes');
 const errorHandler = require('./middleware/errorHandler');
