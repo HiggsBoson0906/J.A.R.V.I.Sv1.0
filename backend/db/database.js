@@ -6,8 +6,10 @@ let dbPromise = null;
 
 async function getDB() {
     if (!dbPromise) {
+        // Support dynamic paths so Fly.io can map a persistent volume directly to the database file
+        const dbPath = process.env.DB_PATH || path.join(__dirname, 'jarvis.db');
         dbPromise = open({
-            filename: path.join(__dirname, 'jarvis.db'),
+            filename: dbPath,
             driver: sqlite3.Database
         });
     }
