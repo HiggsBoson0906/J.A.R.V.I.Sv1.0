@@ -1,10 +1,25 @@
-import React from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import Layout from './Layout';
 import { Play, Pause, RefreshCw, Save } from 'lucide-react';
 import { useTimer } from './TimerContext';
 
 export default function FocusTimer() {
-  const { timeLeft, isActive, topic, mode, setTopic, toggleTimer, resetTimer, handleSaveSessionManually } = useTimer();
+  const user = JSON.parse(localStorage.getItem('user')) || {};
+  const { timeLeft, isActive, topic, mode, sessionSavedTick, setTopic, toggleTimer, resetTimer, handleSaveSessionManually } = useTimer();
+  const [totalFocus, setTotalFocus] = useState(0);
+
+  useEffect(() => {
+    if(user.userId) {
+       fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId } })
+         .then(r => r.json())
+         .then(d => {
+             if(d.success && d.data.focus_hours) {
+                 const total = d.data.focus_hours.reduce((acc, curr) => acc + curr.hours, 0);
+                 setTotalFocus(total);
+             }
+         }).catch(console.error);
+    }
+  }, [user.userId, sessionSavedTick]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -77,17 +92,16 @@ export default function FocusTimer() {
 
           <div className="bg-white dark:bg-slate-900 rounded-lg flex flex-col flex-1 overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 h-96">
             <div className="px-8 pt-8 pb-4 flex justify-between items-center">
-              <h4 className="font-headline font-bold text-slate-900 dark:text-slate-50">Top Focusers</h4>
+              <h4 className="font-headline font-bold text-slate-900 dark:text-slate-50">Your Focus Stats</h4>
             </div>
             <div className="flex-1 overflow-y-auto px-4 pb-8 space-y-2">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-100 dark:border-cyan-500/20">
-                <span className="w-6 text-center font-black text-cyan-600 dark:text-cyan-400 font-headline italic">1</span>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">Alex Chen (You)</p>
-                  <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-widest">Studying</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{user.name || 'Student'} (You)</p>
+                  <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-widest">Total Time Focused</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black font-headline text-slate-900 dark:text-slate-50">{(Math.floor(parseInt(mode)) * 0.7).toFixed(1)}h</p>
+                  <p className="text-sm font-black font-headline text-slate-900 dark:text-slate-50">{totalFocus.toFixed(1)}h</p>
                 </div>
               </div>
             </div>

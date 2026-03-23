@@ -203,6 +203,103 @@ function useCounters() {
     );
     document.querySelectorAll("[data-target]").forEach(el => io.observe(el));
     return () => io.disconnect();
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  UserCircle, 
+  Bot, 
+  Brain, 
+  Terminal, 
+  Calendar, 
+  BarChart, 
+  Sparkles, 
+  Book, 
+  Timer, 
+  TrendingUp, 
+  CheckCircle2,
+  CircleDot,
+  Zap,
+  Target
+} from 'lucide-react';
+
+export default function AuraAILandingPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user && user.userId) {
+        navigate('/dashboard');
+      }
+    }
+    
+    // Scroll Reveal Script
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('section-visible');
+                // Once visible, we can stop observing it
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Initial targeting of all elements with .section-enter
+    const revealSections = document.querySelectorAll('.section-enter');
+    revealSections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // Counter Animation Script
+    function animateValue(obj: Element, start: number, end: number, duration: number) {
+        let startTimestamp: number | null = null;
+        const step = (timestamp: number) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = progress * (end - start) + start;
+            
+            // Format to 1 decimal place if the target is a float, else whole number
+            if (end % 1 !== 0) {
+                obj.innerHTML = current.toFixed(1);
+            } else {
+                obj.innerHTML = Math.floor(current).toString();
+            }
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const targetVal = entry.target.getAttribute('data-target');
+                if (targetVal) {
+                    const target = parseFloat(targetVal);
+                    animateValue(entry.target, 0, target, 2000);
+                    counterObserver.unobserve(entry.target);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-counter').forEach(counter => {
+        counterObserver.observe(counter);
+    });
+
+    return () => {
+        observer.disconnect();
+        counterObserver.disconnect();
+    }
   }, []);
 }
 

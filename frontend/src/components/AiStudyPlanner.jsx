@@ -35,6 +35,7 @@ const TimeBlockEditor = ({ timeStr, onChange }) => (
 );
 
 export default function AiStudyPlanner() {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [plannerTasks, setPlannerTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -46,7 +47,7 @@ export default function AiStudyPlanner() {
   const [newSubText, setNewSubText] = useState("");
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/planner')
+    fetch('http://localhost:3001/api/planner', { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { 
           if (d.success && d.data.plan) {
@@ -67,7 +68,10 @@ export default function AiStudyPlanner() {
     try {
       const res = await fetch('http://localhost:3001/api/generate-plan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-user-id': user.userId || '' 
+        },
         body: JSON.stringify({ 
            subjects: selectedSubjects
         })
@@ -118,11 +122,14 @@ export default function AiStudyPlanner() {
     try {
       const res = await fetch('http://localhost:3001/api/sync-plan', {
          method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
+         headers: { 
+             'Content-Type': 'application/json',
+             'x-user-id': user.userId || ''
+         },
          body: JSON.stringify({ plan: plannerTasks })
       });
       if (res.ok) {
-         window.location.href = '/';
+         window.location.href = '/dashboard';
       }
     } catch(e) { console.error(e); }
   };

@@ -11,6 +11,7 @@ import AdaptivePracticeDashboard from './components/AdaptivePracticeDashboard.js
 import AuraAILandingPage from './components/AuraAILandingPage.tsx';
 import AuraAIAuth from './components/AuraAIAuth.tsx';
 import { TimerProvider } from './components/TimerContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -19,14 +20,16 @@ function App() {
         <Routes>
           <Route path="/" element={<AuraAILandingPage />} />
           <Route path="/auth" element={<AuraAIAuth />} />
-          <Route path="/dashboard" element={<HomeDashboard />} />
-          <Route path="/planner" element={<AiStudyPlanner />} />
-          <Route path="/timer" element={<FocusTimer />} />
-          <Route path="/performance" element={<PerformanceInsights />} />
-          <Route path="/ai-tutor" element={<EnhancedAITutor />} />
-          <Route path="/video-processor" element={<VideoProcessor />} />
-          <Route path="/practice" element={<AdaptivePracticeDashboard />} />
-          <Route path="/profile" element={<ProfileSettings />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<HomeDashboard />} />
+            <Route path="/planner" element={<AiStudyPlanner />} />
+            <Route path="/timer" element={<FocusTimer />} />
+            <Route path="/performance" element={<PerformanceInsights />} />
+            <Route path="/ai-tutor" element={<EnhancedAITutor />} />
+            <Route path="/video-processor" element={<VideoProcessor />} />
+            <Route path="/practice" element={<AdaptivePracticeDashboard />} />
+            <Route path="/profile" element={<ProfileSettings />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </TimerProvider>

@@ -9,6 +9,9 @@ exports.generatePlan = async (req, res) => {
              return res.json({ success: true, data: { plan: [] } });
         }
 
+        const userId = req.headers['x-user-id'];
+        if (!userId) return res.json({ success: false, message: 'Unauthorized payload' });
+
         const db = await getDB();
         const plan = [];
 
@@ -16,8 +19,8 @@ exports.generatePlan = async (req, res) => {
         for (const subject of subjects) {
             // 1. Revision Topic (from performance, weak first)
             const revStmt = await db.get(
-                'SELECT topic_name, accuracy FROM performance WHERE subject_name = ? ORDER BY accuracy ASC LIMIT 1', 
-                [subject]
+                'SELECT topic_name, accuracy FROM performance WHERE subject_name = ? AND user_id = ? ORDER BY accuracy ASC LIMIT 1', 
+                [subject, userId]
             );
 
             if (revStmt) {
@@ -32,9 +35,9 @@ exports.generatePlan = async (req, res) => {
             const newStmt = await db.get(`
                 SELECT topic_name FROM syllabus 
                 WHERE subject_name = ? 
-                AND topic_name NOT IN (SELECT topic_name FROM performance WHERE subject_name = ?) 
+                AND topic_name NOT IN (SELECT topic_name FROM performance WHERE subject_name = ? AND user_id = ?) 
                 LIMIT 1
-            `, [subject, subject]);
+            `, [subject, subject, userId]);
 
             if (newStmt) {
                 plan.push({
@@ -70,8 +73,11 @@ exports.suggestGoals = exports.generatePlan;  // Identical logic structure
 
 exports.getPlanner = async (req, res) => {
     try {
+        const userId = req.headers['x-user-id'];
+        if (!userId) return sendJSON(res, { tomorrow_plan: [] });
+
         const db = await getDB();
-        const perfs = await db.all('SELECT topic_name, accuracy FROM performance');
+        const perfs = await db.all('SELECT topic_name, accuracy FROM performance WHERE user_id = ?', [userId]);
         
         if (!perfs || !perfs.length) {
             return sendJSON(res, { tomorrow_plan: [] });

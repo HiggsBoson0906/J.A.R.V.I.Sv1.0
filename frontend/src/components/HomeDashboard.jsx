@@ -5,6 +5,7 @@ import { Brain, CalendarDays, CheckCircle, Clock, Microscope, Play, Plus, Refres
 import { useTimer } from './TimerContext';
 
 export default function HomeDashboard() {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const navigate = useNavigate();
   const { setTopic } = useTimer();
 
@@ -17,17 +18,17 @@ export default function HomeDashboard() {
   const [customTask, setCustomTask] = useState("");
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/dashboard')
+    fetch('http://localhost:3001/api/dashboard', { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { 
         if (d.success) {
           setDashboardData(d.data);
-          setTodayPlan(d.data.today_plan.map(t => ({ text: t, completed: false })));
+          setTodayPlan(d.data.today_plan.map(t => ({ text: `Revise foundational concepts in ${t}`, rawTopic: t, completed: false })));
         } 
       })
       .catch(e => console.error("Failed dashboard fetch", e));
       
-    fetch('http://localhost:3001/api/performance')
+    fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error("Failed metrics fetch", e));
@@ -38,7 +39,10 @@ export default function HomeDashboard() {
     try {
       const res = await fetch('http://localhost:3001/api/generate-plan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user.userId || ''
+        },
         body: JSON.stringify({ performance_data: dashboardData ? dashboardData.weak_topics : [] })
       });
       const data = await res.json();
@@ -54,10 +58,40 @@ export default function HomeDashboard() {
     navigate('/timer');
   };
 
-  const toggleTask = (idx) => {
+    const toggleTask = async (idx) => {
     const fresh = [...todayPlan];
-    fresh[idx].completed = !fresh[idx].completed;
+    const isNowCompleted = !fresh[idx].completed;
+    fresh[idx].completed = isNowCompleted;
     setTodayPlan(fresh);
+
+    if (isNowCompleted) {
+      try {
+        await fetch('http://localhost:3001/api/study-session', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'x-user-id': user.userId || ''
+            },
+            body: JSON.stringify({
+                subject_name: 'Task Completion',
+                topic: fresh[idx].rawTopic || fresh[idx].text,
+                duration: 90
+            })
+        });
+        
+        // Live refresh so the metric visibly increments
+        const pRes = await fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } });
+        const pData = await pRes.json();
+        if (pData.success) {
+            setPerfData(pData.data);
+        }
+        
+        // Remove from UI after a short delay to allow the animation to play
+        setTimeout(() => {
+           setTodayPlan(prev => prev.filter((_, i) => i !== idx));
+        }, 800);
+      } catch(e) { console.error("Failed to sync task time", e); }
+    }
   };
 
   const handleAddCustom = (e) => {
@@ -78,7 +112,7 @@ export default function HomeDashboard() {
       <div className="p-8 w-full max-w-7xl mx-auto relative">
         <section className="mb-10">
           <h2 className="text-4xl font-extrabold font-headline tracking-tight text-slate-900 dark:text-slate-50 mb-2">
-            Good evening, {dashboardData ? dashboardData.user_name : "Guest"}
+            Good evening, {user.name || "Student"}
           </h2>
           <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">Let’s make today productive</p>
         </section>
@@ -176,7 +210,7 @@ export default function HomeDashboard() {
             </div>
           </div>
 
-          <div className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-slate-900 rounded-lg p-6 flex items-center justify-between shadow-sm border border-slate-200 dark:border-slate-800">
               <div>
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Focus Hours (Wk)</p>
@@ -184,16 +218,6 @@ export default function HomeDashboard() {
               </div>
               <div className="w-12 h-12 bg-cyan-50 dark:bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <Clock className="w-6 h-6"/>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-6 flex items-center justify-between shadow-sm border border-slate-200 dark:border-slate-800">
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Time Mgmt Score</p>
-                <p className="text-3xl font-black font-headline text-slate-900 dark:text-slate-50">{timeMgmt}<span className="text-lg font-medium text-slate-400 ml-1">pts</span></p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <CheckCircle className="w-6 h-6"/>
               </div>
             </div>
 

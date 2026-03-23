@@ -15,6 +15,7 @@ router.post('/study-session', sessionController.recordSession);
 router.post('/suggest-goals', plannerController.suggestGoals);
 router.get('/planner', plannerController.getPlanner);
 router.get('/performance', dashboardController.getPerformance);
+router.get('/profile-stats', dashboardController.getProfileStats);
 router.post('/process-video', videoController.processVideo);
 router.post('/sync-plan', dashboardController.syncPlan);
 

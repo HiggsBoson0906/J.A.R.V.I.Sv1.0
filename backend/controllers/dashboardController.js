@@ -10,21 +10,29 @@ exports.syncPlan = (req, res) => {
 
 exports.getDashboard = async (req, res) => {
     try {
+        const userId = req.headers['x-user-id'];
+        if (!userId) return sendJSON(res, { user_name: "", today_plan: [], weak_topics: [] });
+
         const db = await getDB();
-        const user = await db.get('SELECT * FROM users LIMIT 1');
+        const user = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
         if (!user) {
             return sendJSON(res, { user_name: "", today_plan: [], weak_topics: [] });
         }
         
         const perfs = await db.all('SELECT * FROM performance WHERE user_id = ?', [user.id]);
         
-        const weak_topics = perfs.map(p => ({
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        const weak_topics = perfs.filter(p => {
+            if (p.last_studied && p.last_studied.startsWith(todayStr)) return false;
+            return getStatus(p.accuracy) === 'Weak';
+        }).map(p => ({
             topic_name: p.topic_name,
             accuracy: p.accuracy,
-            status: getStatus(p.accuracy)
-        })).filter(t => t.status === 'Weak');
+            status: 'Weak'
+        }));
 
-        let today_plan = weak_topics.slice(0, 3).map(t => `Revise foundational concepts in ${t.topic_name}`);
+        let today_plan = weak_topics.slice(0, 3).map(t => t.topic_name);
         
         if (currentSyncedPlan && currentSyncedPlan.length > 0) {
             today_plan = currentSyncedPlan.map(t => `${t.time.split(' - ')[0]} | ${t.task}`);
@@ -42,13 +50,17 @@ exports.getDashboard = async (req, res) => {
 
 exports.getPerformance = async (req, res) => {
     try {
+        const userId = req.headers['x-user-id'];
+        if (!userId) return sendJSON(res, { metrics: { accuracy: 0, time_management: 0, revision: 0, coverage: 0 }, focus_hours: [] });
+
         const db = await getDB();
-        const user = await db.get('SELECT * FROM users LIMIT 1');
+        const user = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
         if (!user) {
-            return sendJSON(res, { metrics: { accuracy: 0, time_management: 0, revision: 0, coverage: 0 }, focus_hours: [] });
+            return sendJSON(res, { metrics: { accuracy: 0, retention: 0, streak: 0 }, focus_hours: [] });
         }
 
         const stats = await db.get('SELECT AVG(accuracy) as avg_acc FROM performance WHERE user_id = ?', [user.id]);
+        const userStats = await db.get('SELECT retention_rate, streak FROM user_metrics WHERE user_id = ?', [user.id]) || { retention_rate: 68, streak: 1 };
         const sessions = await db.all(`
             SELECT strftime('%w', timestamp) as dow, SUM(duration) as total_min 
             FROM study_sessions 
@@ -65,9 +77,8 @@ exports.getPerformance = async (req, res) => {
         sendJSON(res, {
             metrics: {
                 accuracy: Math.round(stats.avg_acc || 0),
-                time_management: user.id ? 85 : 0, 
-                revision: user.id ? 70 : 0,
-                coverage: user.id ? 60 : 0
+                retention: userStats.retention_rate,
+                streak: userStats.streak
             },
             focus_hours
         });

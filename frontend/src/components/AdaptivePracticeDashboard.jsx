@@ -15,11 +15,12 @@ function AccuracyBadge({ accuracy }) {
 
 // ─── STEP 1: Subject Selection ─────────────────────────────────────────────
 function SubjectView({ onSelect }) {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/practice/subjects`)
+    fetch(`${API}/practice/subjects`, { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { if (d.success) setSubjects(d.data.subjects); })
       .catch(() => setSubjects(['Physics', 'Chemistry', 'Mathematics']))
@@ -112,16 +113,23 @@ function SubjectView({ onSelect }) {
 
 // ─── STEP 2: Topic Selection ───────────────────────────────────────────────
 function TopicView({ subject, onStart, onBack }) {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/practice/topics?subject=${encodeURIComponent(subject)}`)
+    fetch(`${API}/practice/topics?subject=${encodeURIComponent(subject)}`, { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { if (d.success) setTopics(d.data.topics); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [subject]);
+  }, [subject, user.userId]);
+
+  const totalProblems = topics.reduce((acc, t) => acc + (t.questions_attempted || 0), 0);
+  const attemptedTopics = topics.filter(t => t.accuracy !== null && t.accuracy !== undefined);
+  const avgAccuracy = attemptedTopics.length 
+    ? Math.round(attemptedTopics.reduce((acc, t) => acc + t.accuracy, 0) / attemptedTopics.length) 
+    : 0;
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-10">
@@ -185,9 +193,9 @@ function TopicView({ subject, onStart, onBack }) {
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6">
            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Subject Stats</h3>
            <div className="space-y-4 text-sm font-semibold text-slate-600 dark:text-slate-300">
-               <div className="flex justify-between"><span className="text-slate-400">Total Problems</span><span className="text-slate-900 dark:text-white font-bold">1,248</span></div>
-               <div className="flex justify-between"><span className="text-slate-400">Avg. Accuracy</span><span className="text-slate-900 dark:text-white font-bold">62%</span></div>
-               <div className="flex justify-between"><span className="text-slate-400">Time Spent</span><span className="text-slate-900 dark:text-white font-bold">18.2 hrs</span></div>
+               <div className="flex justify-between"><span className="text-slate-400">Total Problems</span><span className="text-slate-900 dark:text-white font-bold">{totalProblems}</span></div>
+               <div className="flex justify-between"><span className="text-slate-400">Avg. Accuracy</span><span className="text-slate-900 dark:text-white font-bold">{avgAccuracy}%</span></div>
+               <div className="flex justify-between"><span className="text-slate-400">Topics Practiced</span><span className="text-slate-900 dark:text-white font-bold">{attemptedTopics.length} / {topics.length}</span></div>
            </div>
         </div>
 
@@ -209,6 +217,7 @@ function TopicView({ subject, onStart, onBack }) {
 
 // ─── STEP 3: MCQ Test ─────────────────────────────────────────────────────
 function TestView({ subject, topic, onComplete, onBack }) {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
@@ -219,7 +228,10 @@ function TestView({ subject, topic, onComplete, onBack }) {
     setLoading(true);
     fetch(`${API}/practice/questions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user.userId || ''
+      },
       body: JSON.stringify({ topic })
     })
       .then(r => r.json())
@@ -361,13 +373,17 @@ function TestView({ subject, topic, onComplete, onBack }) {
 
 // ─── STEP 4: Result View ───────────────────────────────────────────────────
 function ResultView({ subject, topic, answersArray, onRetry, onBack }) {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API}/practice/submit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user.userId || ''
+      },
       body: JSON.stringify({ topic, subject, answers: answersArray })
     })
       .then(r => r.json())

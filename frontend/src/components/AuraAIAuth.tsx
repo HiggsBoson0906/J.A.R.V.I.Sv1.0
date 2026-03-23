@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,16 @@ const API = 'http://localhost:3001/api';
 export default function AuraAIAuth() {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user && user.userId) {
+        navigate('/dashboard');
+      }
+    }
+  }, [navigate]);
   
   // Form states
   const [email, setEmail] = useState('');
