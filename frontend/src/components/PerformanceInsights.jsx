@@ -3,23 +3,24 @@ import Layout from './Layout';
 import { ArrowRight, HelpCircle, Sparkles, TrendingDown } from 'lucide-react';
 
 export default function PerformanceInsights() {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [perfData, setPerfData] = useState(null);
-  const [plannerTasks, setPlannerTasks] = useState([]);
+  const [dashData, setDashData] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/performance')
+    fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error(e));
 
-    fetch('http://localhost:3001/api/planner')
+    fetch('http://localhost:3001/api/dashboard', { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
-      .then(d => { if (d.success && d.data.plan) setPlannerTasks(d.data.plan); })
-      .catch(e => console.error("Error fetching planner", e));
+      .then(d => { if (d.success) setDashData(d.data); })
+      .catch(e => console.error("Error fetching dashboard", e));
   }, []);
 
   const totalFocus = perfData ? perfData.focus_hours.reduce((a, c) => a + c.hours, 0).toFixed(1) : "0.0";
-  const m = perfData ? perfData.metrics : { accuracy: 0, time_management: 0, revision: 0, coverage: 0 };
+  const m = perfData ? perfData.metrics : { accuracy: 0, retention: 0, streak: 0 };
   
   return (
     <Layout>
@@ -87,16 +88,15 @@ export default function PerformanceInsights() {
             </div>
           </section>
 
-          {/* Revision Intelligence Grid */}
           <section className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white dark:bg-slate-900 p-6 rounded-lg flex flex-col gap-4 shadow-sm border border-slate-200 dark:border-slate-800">
                <h4 className="font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div>Due Today</h4>
                <ul className="space-y-3 mt-2">
-                 {plannerTasks.length > 0 ? (
-                   plannerTasks.slice(0, 3).map((task, idx) => (
+                 {dashData?.today_plan && dashData.today_plan.length > 0 ? (
+                   dashData.today_plan.slice(0, 3).map((taskText, idx) => (
                      <li key={idx} className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-                       <span className="text-slate-700 dark:text-slate-300 font-medium truncate pr-2" title={task.title}>{task.title || "Study Session"}</span>
-                       <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold whitespace-nowrap">{task.time}</span>
+                       <span className="text-slate-700 dark:text-slate-300 font-medium truncate pr-2" title={taskText}>{taskText}</span>
+                       <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold whitespace-nowrap">Priority</span>
                      </li>
                    ))
                  ) : (
@@ -108,21 +108,23 @@ export default function PerformanceInsights() {
             <div className="bg-white dark:bg-slate-900 p-6 rounded-lg flex flex-col gap-4 shadow-sm border border-slate-200 dark:border-slate-800">
                <h4 className="font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-orange-500"></div>At Risk Topics</h4>
                <ul className="space-y-3 mt-2">
-                 <li className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-                   <span className="text-slate-700 dark:text-slate-300 font-medium">Organic Chemistry</span>
-                   <span className="text-xs font-bold text-slate-500">42% Retained</span>
-                 </li>
-                 <li className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-                   <span className="text-slate-700 dark:text-slate-300 font-medium">Macroeconomics</span>
-                   <span className="text-xs font-bold text-slate-500">55% Retained</span>
-                 </li>
+                 {dashData?.weak_topics && dashData.weak_topics.filter(t => t.accuracy < 60).length > 0 ? (
+                   dashData.weak_topics.filter(t => t.accuracy < 60).slice(0, 3).map((t, idx) => (
+                     <li key={idx} className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                       <span className="text-slate-700 dark:text-slate-300 font-medium">{t.topic_name}</span>
+                       <span className="text-xs font-bold text-slate-500">{t.accuracy}% Retained</span>
+                     </li>
+                   ))
+                 ) : (
+                   <p className="text-sm text-slate-500">Great job! No topics currently at risk.</p>
+                 )}
                </ul>
             </div>
             
             <div className="bg-white dark:bg-slate-900 p-6 rounded-lg flex flex-col justify-center items-center gap-2 shadow-sm border border-slate-200 dark:border-slate-800 h-full">
                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest text-center mt-2">Retention Score</p>
-               <div className="text-5xl font-black font-headline text-emerald-600 dark:text-emerald-400 my-2">68%</div>
-               <p className="text-xs font-bold text-emerald-600/70 dark:text-emerald-400/70 text-center mb-2">+5% vs last week</p>
+               <div className="text-5xl font-black font-headline text-emerald-600 dark:text-emerald-400 my-2">{m.retention}%</div>
+               <p className="text-xs font-bold text-emerald-600/70 dark:text-emerald-400/70 text-center mb-2">Steady retention curve</p>
             </div>
           </section>
 
@@ -158,12 +160,12 @@ export default function PerformanceInsights() {
             
             <div className="mt-12 w-full grid grid-cols-2 gap-4">
                <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
-                  <p className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest text-left">Highest</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-50 text-left">Mathematics</p>
+                  <p className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest text-left">Accuracy</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-50 text-left">{m.accuracy}%</p>
                </div>
                <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
-                  <p className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-widest text-left">Growth</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-50 text-left">Physical Chem</p>
+                  <p className="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-widest text-left">Retention Rate</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-50 text-left">{m.retention}%</p>
                </div>
             </div>
           </section>
@@ -176,19 +178,10 @@ export default function PerformanceInsights() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
                   <span className="text-slate-500">Retention Rate</span>
-                  <span className="text-cyan-600 dark:text-cyan-400">76%</span>
+                  <span className="text-cyan-600 dark:text-cyan-400">{m.retention}%</span>
                 </div>
                 <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-600 rounded-full" style={{ width: `76%` }}></div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                  <span className="text-slate-500">Revision Consistency</span>
-                  <span className="text-cyan-600 dark:text-cyan-400">89%</span>
-                </div>
-                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-600 rounded-full" style={{ width: `89%` }}></div>
+                  <div className="h-full bg-cyan-600 rounded-full" style={{ width: `${m.retention}%` }}></div>
                 </div>
               </div>
             </div>
@@ -198,7 +191,7 @@ export default function PerformanceInsights() {
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Focus Time (WK)</p>
               </div>
               <div>
-                <p className="text-3xl font-black font-headline text-slate-900 dark:text-slate-50">14</p>
+                <p className="text-3xl font-black font-headline text-slate-900 dark:text-slate-50">{m.streak}</p>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Streaks Kept</p>
               </div>
             </div>

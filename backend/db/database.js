@@ -56,6 +56,12 @@ async function initDB() {
             last_studied DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
+        CREATE TABLE IF NOT EXISTS user_metrics (
+            user_id INTEGER PRIMARY KEY,
+            retention_rate INTEGER DEFAULT 68,
+            streak INTEGER DEFAULT 1,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
         CREATE TABLE IF NOT EXISTS syllabus (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             subject_name TEXT NOT NULL,

@@ -3,10 +3,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const TimerContext = createContext();
 
 export const TimerProvider = ({ children }) => {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
     const [topic, setTopic] = useState('Quantum Mechanics');
     const [mode, setMode] = useState('25');
+    const [sessionSavedTick, setSessionSavedTick] = useState(0);
 
     useEffect(() => {
         let interval = null;
@@ -19,10 +21,14 @@ export const TimerProvider = ({ children }) => {
             const durationMins = Math.floor(durationSecs / 60) || parseInt(mode); 
             fetch('http://localhost:3001/api/study-session', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': user.userId || ''
+                },
                 body: JSON.stringify({ topic, duration: durationMins })
             })
             .then(() => {
+                setSessionSavedTick(t => t+1);
                 alert("Session Finished & Saved successfully!");
                 resetTimer(parseInt(mode));
             })
@@ -46,12 +52,16 @@ export const TimerProvider = ({ children }) => {
 
          fetch('http://localhost:3001/api/study-session', {
               method: 'POST',
-              headers: {'Content-Type': 'application/json'},
+              headers: {
+                  'Content-Type': 'application/json',
+                  'x-user-id': user.userId || ''
+              },
               body: JSON.stringify({ topic, duration: durationMins })
          })
          .then(r => r.json())
          .then(d => {
              if(d.success) {
+                 setSessionSavedTick(t => t+1);
                  alert("Session Saved manually!");
                  resetTimer(parseInt(mode));
              }
@@ -61,7 +71,7 @@ export const TimerProvider = ({ children }) => {
 
     return (
         <TimerContext.Provider value={{ 
-            timeLeft, isActive, topic, mode, 
+            timeLeft, isActive, topic, mode, sessionSavedTick,
             setTopic, toggleTimer, resetTimer, handleSaveSessionManually
         }}>
             {children}

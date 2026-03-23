@@ -11,6 +11,7 @@ const DUMMY_NOTIFICATIONS = [
 ];
 
 export default function Layout({ children }) {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const location = useLocation();
   const navigate = useNavigate();
   const { isActive, timeLeft } = useTimer();
@@ -28,7 +29,11 @@ export default function Layout({ children }) {
     setAiAsking(true);
     try {
       const res = await fetch('http://localhost:3001/api/ask-doubt', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.userId || ''
+        },
         body: JSON.stringify({ question: aiQuestion })
       });
       const d = await res.json();
@@ -116,12 +121,18 @@ export default function Layout({ children }) {
           <div className="flex items-center gap-3">
             <img alt="User Avatar" className="w-10 h-10 rounded-full bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTr2lSjNuE4tN0G-ObCMlK1bUjLt73TgkJffJqESR_8P94gTXK08qduVe32ZXqUlySDi3ugqoO7oI5Bk8IVW7fdD8_sBQ9wztJycb5macSYk2z7aZyVjg_ram7xUwCX6VUoy8d-476ca2VITXvkr8ldff6GIWTInGjU6_y-PtcXUqRL90zJUBZZE2Oo0WSDlzmEoFb5_qNf6MG-Sq1sXaAKRmRUgkATabgLp_0SmxZ_5JWm_ItYJX6CaL1j6UwOhmG2-XUQ6no1fwm"/>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate dark:text-slate-200">Alex Chen</p>
+              <p className="text-sm font-bold truncate dark:text-slate-200">{user.name || 'Student'}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Pro Plan</p>
             </div>
             <User className="text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors flex-shrink-0" />
           </div>
         </Link>
+        <button 
+          onClick={() => { localStorage.removeItem('user'); navigate('/auth'); }} 
+          className="mt-3 p-3 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-bold text-sm tracking-widest uppercase rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-all border border-red-200 dark:border-red-500/20 active:scale-95 cursor-pointer"
+        >
+          Sign Out
+        </button>
       </aside>
 
       <header className="fixed top-0 right-0 w-[calc(100%-16rem)] z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl flex justify-between items-center h-16 px-8 border-b border-slate-200 dark:border-slate-800">
@@ -193,101 +204,6 @@ export default function Layout({ children }) {
       <main className="ml-64 pt-24 min-h-screen">
         {children}
       </main>
-
-      {/* JARVIS AI Floating Button + Doubt Solver Panel */}
-      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
-        {/* Slide-up Chat Panel */}
-        {aiOpen && (
-          <div className="w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/50 border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="bg-gradient-to-r from-cyan-700 to-slate-900 px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {/* Mini JARVIS HUD */}
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="animate-spin" style={{animationDuration: '8s'}}>
-                  <circle cx="16" cy="16" r="14" stroke="#22d3ee" strokeWidth="1" strokeDasharray="4 2" opacity="0.5"/>
-                  <circle cx="16" cy="16" r="10" stroke="#22d3ee" strokeWidth="1.5" strokeDasharray="6 3"/>
-                  <circle cx="16" cy="16" r="6" stroke="#22d3ee" strokeWidth="2"/>
-                  <circle cx="16" cy="16" r="2.5" fill="#22d3ee"/>
-                </svg>
-                <div>
-                  <h3 className="font-bold text-white text-sm">J.A.R.V.I.S.</h3>
-                  <p className="text-cyan-400 text-[10px] font-bold uppercase tracking-widest">AI Doubt Solver</p>
-                </div>
-              </div>
-              <button onClick={() => { setAiOpen(false); setAiAnswer(null); setAiQuestion(''); }} className="text-slate-400 hover:text-white transition-colors cursor-pointer"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="p-5 min-h-40 max-h-80 overflow-y-auto">
-              {aiAnswer ? (
-                <div className="space-y-3">
-                  <div className="bg-cyan-50 dark:bg-cyan-500/10 p-4 rounded-xl border border-cyan-100 dark:border-cyan-500/20">
-                    <p className="text-[10px] font-bold text-cyan-600 uppercase tracking-widest mb-2">Explanation</p>
-                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">{aiAnswer.explanation}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-emerald-50 dark:bg-emerald-500/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Hint</p>
-                      <p className="text-xs text-slate-700 dark:text-slate-300">{aiAnswer.hint}</p>
-                    </div>
-                    <div className="bg-amber-50 dark:bg-amber-500/10 p-3 rounded-xl border border-amber-100 dark:border-amber-500/20">
-                      <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-1">Exam Tip</p>
-                      <p className="text-xs text-slate-700 dark:text-slate-300">{aiAnswer.exam_tip}</p>
-                    </div>
-                  </div>
-                  <button onClick={() => { setAiAnswer(null); setAiQuestion(''); }} className="text-xs text-cyan-600 dark:text-cyan-400 font-bold hover:underline cursor-pointer">← Ask another question</button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-32 text-center">
-                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">What's confusing you?</p>
-                  <p className="text-xs text-slate-400 mt-1">Type any concept, equation, or problem and I'll break it down.</p>
-                </div>
-              )}
-            </div>
-            {!aiAnswer && (
-              <div className="px-4 pb-4">
-                <div className="relative">
-                  <input 
-                    type="text" value={aiQuestion} onChange={e => setAiQuestion(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleAskDoubt()}
-                    placeholder="Ask me anything..."
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-full py-3 pl-4 pr-12 text-sm outline-none focus:border-cyan-500 dark:text-white"
-                    disabled={aiAsking}
-                  />
-                  <button onClick={handleAskDoubt} disabled={aiAsking} className="absolute right-1 top-1 w-10 h-10 bg-cyan-600 text-white rounded-full flex items-center justify-center hover:bg-cyan-700 active:scale-95 transition-all cursor-pointer">
-                    <Send className={`w-4 h-4 ${aiAsking ? 'animate-pulse' : ''}`} />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* JARVIS HUD FAB Button */}
-        <button onClick={() => setAiOpen(o => !o)} className="w-16 h-16 rounded-full bg-slate-900 border border-cyan-400/50 shadow-xl shadow-cyan-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 relative cursor-pointer overflow-visible">
-          {/* Outermost slow-spin ring — fits exactly at button edge */}
-          <div className="absolute inset-0 animate-spin" style={{animationDuration:'14s'}}>
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-              <circle cx="32" cy="32" r="30" stroke="#22d3ee" strokeWidth="0.8" strokeDasharray="5 4" opacity="0.35"/>
-            </svg>
-          </div>
-          {/* Mid counter-spin ring */}
-          <div className="absolute inset-0 animate-spin" style={{animationDuration:'9s', animationDirection:'reverse'}}>
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-              <circle cx="32" cy="32" r="23" stroke="#22d3ee" strokeWidth="1" strokeDasharray="6 3" opacity="0.5"/>
-            </svg>
-          </div>
-          {/* Inner spin ring */}
-          <div className="absolute inset-0 animate-spin" style={{animationDuration:'6s'}}>
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-              <circle cx="32" cy="32" r="16" stroke="#22d3ee" strokeWidth="1.2" strokeDasharray="5 2" opacity="0.65"/>
-            </svg>
-          </div>
-          {/* Center static ring + dot */}
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="absolute inset-0">
-            <circle cx="32" cy="32" r="9" stroke="#22d3ee" strokeWidth="1.5" opacity="0.9"/>
-            <circle cx="32" cy="32" r="4" fill="#22d3ee" opacity="0.25"/>
-            <circle cx="32" cy="32" r="2.5" fill="#22d3ee"/>
-          </svg>
-        </button>
-      </div>
     </div>
   );
 }

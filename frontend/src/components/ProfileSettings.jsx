@@ -1,19 +1,29 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import Layout from './Layout';
 import { BarChart2, CheckCircle, ChevronRight, Edit2, Mail, Phone, Save, Target, User, X } from 'lucide-react';
 
 const TARGET_EXAMS = ['JEE', 'NEET', 'UPSC', 'CAT', 'GATE', 'Other'];
 
 export default function ProfileSettings() {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Alex Carter',
-    email: 'alex.c@example.com',
-    phone: '+91 98765 43210',
-    targetExam: 'JEE',
-    bio: 'Passionate about AI ethics and distributed systems. Currently mastering Neural Networks while juggling three core projects.',
+    name: user.name || 'Alex Carter',
+    email: user.email || 'alex.c@example.com',
+    targetExam: user.course || 'JEE',
+    bio: `Passionate about AI ethics and distributed systems. Target: ${user.exam_year || '2026'}.`,
   });
   const [draft, setDraft] = useState(profile);
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    if(user.userId) {
+      fetch('http://localhost:3001/api/profile-stats', { headers: { 'x-user-id': user.userId } })
+      .then(r => r.json())
+      .then(d => { if(d.success) setStats(d.data); })
+      .catch(console.error);
+    }
+  }, [user.userId]);
 
   const handleSave = () => {
     setProfile(draft);
@@ -138,7 +148,6 @@ export default function ProfileSettings() {
                 <div className="space-y-3">
                   <Field icon={<User className="w-4 h-4"/>} label="Full Name" fieldKey="name" />
                   <Field icon={<Mail className="w-4 h-4"/>} label="Email Address" fieldKey="email" type="email" />
-                  <Field icon={<Phone className="w-4 h-4"/>} label="Phone Number" fieldKey="phone" type="tel" />
                   <Field icon={<Target className="w-4 h-4"/>} label="Target Exam" fieldKey="targetExam" isSelect />
                 </div>
               </div>
@@ -151,37 +160,44 @@ export default function ProfileSettings() {
                 <div className="bg-white dark:bg-slate-900 p-7 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                   <div className="flex items-center justify-between mb-3">
                     <BarChart2 className="text-cyan-600 dark:text-cyan-400 w-7 h-7" />
-                    <span className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20">+12% this week</span>
+                    {stats?.strongest && (
+                      <span className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 truncate max-w-[120px]">
+                        Strongest: {stats.strongest.topic_name}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Study Time</p>
-                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">428.5 <span className="text-base font-normal text-slate-400">hrs</span></h4>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Focus Time</p>
+                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">{(stats?.focus_time ? (stats.focus_time/60).toFixed(1) : "0.0")} <span className="text-base font-normal text-slate-400">hrs</span></h4>
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-7 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                   <div className="flex items-center justify-between mb-3">
                     <CheckCircle className="text-cyan-600 dark:text-cyan-400 w-7 h-7" />
-                    <span className="text-[10px] font-bold bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-2.5 py-1 rounded-full border border-cyan-100 dark:border-cyan-500/20">98% Success</span>
+                    {stats?.weakest && (
+                      <span className="text-[10px] font-bold bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full border border-red-100 dark:border-red-500/20 truncate max-w-[120px]">
+                        Weakest: {stats.weakest.topic_name}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sessions Completed</p>
-                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">1,240 <span className="text-base font-normal text-slate-400">total</span></h4>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tests Attempted</p>
+                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">{stats?.tests || 0} <span className="text-base font-normal text-slate-400">Q's</span></h4>
                 </div>
               </div>
 
-              {/* Focus Distribution */}
-              <div className="bg-white dark:bg-slate-900 p-7 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="font-bold text-slate-900 dark:text-slate-50">Focus Distribution</h4>
-                  <select className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold px-3 py-1.5 text-slate-700 dark:text-slate-300 outline-none cursor-pointer">
-                    <option>Last 30 Days</option>
-                    <option>Last 7 Days</option>
-                  </select>
-                </div>
-                <div className="flex items-end justify-between h-36 gap-3">
-                  {[40, 65, 85, 45, 95, 60, 75].map((h, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-cyan-100 dark:bg-cyan-900/40 hover:bg-cyan-500 dark:hover:bg-cyan-600 transition-colors rounded-t-lg cursor-pointer" style={{ height: `${h}%` }}></div>
-                      <span className="text-[9px] font-bold text-slate-400">{['M','T','W','T','F','S','S'][i]}</span>
+              {/* Revision Table */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-7 shadow-sm border border-slate-200 dark:border-slate-800 mt-6">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">Urgent Revision Needed</h3>
+                <div className="space-y-3 mt-4">
+                  {stats?.revisions && stats.revisions.length > 0 ? stats.revisions.map((rev, i) => (
+                    <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{rev.topic_name}</p>
+                        <p className="text-[10px] uppercase font-bold text-red-400 tracking-wider font-semibold">{rev.subject_name}</p>
+                      </div>
+                      <span className="text-xs font-bold text-red-600 dark:text-red-400">{rev.accuracy}% Acc</span>
                     </div>
-                  ))}
+                  )) : (
+                     <p className="text-sm text-slate-500 italic">No critically weak topics detected yet. Keep up the good work!</p>
+                  )}
                 </div>
               </div>
             </div>

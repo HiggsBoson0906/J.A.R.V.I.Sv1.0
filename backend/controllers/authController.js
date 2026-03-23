@@ -17,13 +17,17 @@ exports.signup = async (req, res) => {
                 [name, email, password, course || null, exam_year || null]
             );
             
+            await db.run('INSERT INTO user_metrics (user_id, retention_rate, streak) VALUES (?, 68, 1)', [result.lastID]);
+            
             res.status(201).json({ 
                 success: true, 
                 message: "User created securely.",
                 data: {
                     userId: result.lastID,
                     name: name,
-                    email: email
+                    email: email,
+                    course: course,
+                    exam_year: exam_year
                 }
             });
         } catch (e) {
@@ -57,7 +61,9 @@ exports.login = async (req, res) => {
                 data: {
                     userId: user.id,
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    course: user.course,
+                    exam_year: user.exam_year
                 }
             });
         } else {

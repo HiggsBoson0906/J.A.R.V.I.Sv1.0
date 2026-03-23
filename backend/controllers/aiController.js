@@ -17,17 +17,31 @@ function detectSubject(question) {
   return null;
 }
 
-async function fetchContext(question) {
+async function fetchContext(question, userId) {
   try {
     const db = await getDB();
     const subject = detectSubject(question);
-    const sessions = await db.all(`SELECT topic, subject_name FROM study_sessions ORDER BY timestamp DESC LIMIT 10`);
+    
+    let sessions = [];
+    if (userId) {
+       sessions = await db.all(`SELECT topic, subject_name FROM study_sessions WHERE user_id = ? ORDER BY timestamp DESC LIMIT 10`, [userId]);
+    } else {
+       sessions = await db.all(`SELECT topic, subject_name FROM study_sessions ORDER BY timestamp DESC LIMIT 10`);
+    }
+
     let perfRows = [];
     if (subject) {
-      perfRows = await db.all(
-        `SELECT topic_name, accuracy FROM performance WHERE subject_name = ? ORDER BY last_studied DESC LIMIT 5`,
-        [subject]
-      );
+      if (userId) {
+         perfRows = await db.all(
+           `SELECT topic_name, accuracy FROM performance WHERE subject_name = ? AND user_id = ? ORDER BY last_studied DESC LIMIT 5`,
+           [subject, userId]
+         );
+      } else {
+         perfRows = await db.all(
+           `SELECT topic_name, accuracy FROM performance WHERE subject_name = ? ORDER BY last_studied DESC LIMIT 5`,
+           [subject]
+         );
+      }
     }
     const sessionText = sessions.length > 0
       ? sessions.map(s => `- ${s.topic} (${s.subject_name})`).join('\n')
@@ -49,6 +63,8 @@ exports.askDoubt = async (req, res) => {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    const userId = req.headers['x-user-id'];
+    
     if (!apiKey) {
       return sendJSON(res, {
         explanation: 'AI not configured. Add GEMINI_API_KEY to your .env file.',
@@ -57,7 +73,7 @@ exports.askDoubt = async (req, res) => {
       });
     }
 
-    const context = await fetchContext(question);
+    const context = await fetchContext(question, userId);
     const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `You are an expert JEE/NEET teacher with deep knowledge of Mathematics, Physics, and Chemistry.

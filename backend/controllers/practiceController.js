@@ -32,12 +32,15 @@ exports.getTopics = async (req, res) => {
     const { subject } = req.query;
     if (!subject) return sendError(res, 'subject query param is required');
 
+    const userId = req.headers['x-user-id'];
+    if (!userId) return sendError(res, 'User context missing', 401);
+
     const db = await getDB();
 
     // Join performance data if available
     const perfRows = await db.all(
-      `SELECT topic_name, accuracy, questions_attempted FROM performance WHERE subject_name = ? ORDER BY accuracy ASC`,
-      [subject]
+      `SELECT topic_name, accuracy, questions_attempted FROM performance WHERE subject_name = ? AND user_id = ? ORDER BY accuracy ASC`,
+      [subject, userId]
     );
 
     // Also grab topics from syllabus table that may not be in performance yet
@@ -89,9 +92,10 @@ exports.getQuestions = async (req, res) => {
     const { topic } = req.body;
     if (!topic) return sendError(res, 'topic is required');
 
+    const userId = req.headers['x-user-id'];
     // Determine difficulty based on current accuracy
     const db = await getDB();
-    const perf = await db.get(`SELECT accuracy FROM performance WHERE topic_name = ? LIMIT 1`, [topic]);
+    const perf = await db.get(`SELECT accuracy FROM performance WHERE topic_name = ? AND user_id = ? LIMIT 1`, [topic, userId]);
     const accuracy = perf ? perf.accuracy : null;
     const difficulty = accuracy === null ? 'standard'
                      : accuracy < 50     ? 'easier (foundational)'
@@ -169,11 +173,14 @@ exports.submitPractice = async (req, res) => {
     const accuracy = total > 0 ? Math.round((score / total) * 100) : 0;
     const label   = accuracy < 50 ? 'Weak' : accuracy <= 75 ? 'Moderate' : 'Strong';
 
+    const userId = req.headers['x-user-id'];
+    if (!userId) return sendError(res, 'User ID header missing', 401);
+
     // Update performance table
     const db = await getDB();
     const existing = await db.get(
-      `SELECT id, questions_attempted, correct_answers FROM performance WHERE topic_name = ? LIMIT 1`,
-      [topic]
+      `SELECT id, questions_attempted, correct_answers FROM performance WHERE topic_name = ? AND user_id = ? LIMIT 1`,
+      [topic, userId]
     );
 
     if (existing) {
@@ -187,15 +194,14 @@ exports.submitPractice = async (req, res) => {
     } else {
       await db.run(
         `INSERT INTO performance (user_id, subject_name, topic_name, accuracy, questions_attempted, correct_answers)
-         VALUES (1, ?, ?, ?, ?, ?)`,
-        [subject || 'General', topic, accuracy, total, score]
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [userId, subject || 'General', topic, accuracy, total, score]
       );
     }
 
-    // Also record in study_sessions
     await db.run(
-      `INSERT INTO study_sessions (user_id, subject_name, topic, duration) VALUES (1, ?, ?, ?)`,
-      [subject || 'General', topic, total * 30] // rough estimate: 30s per question
+      `INSERT INTO study_sessions (user_id, subject_name, topic, duration) VALUES (?, ?, ?, ?)`,
+      [userId, subject || 'General', topic, total * 30] // rough estimate: 30s per question
     );
 
     return sendJSON(res, { score, total, accuracy, label });

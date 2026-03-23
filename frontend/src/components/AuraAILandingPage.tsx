@@ -21,6 +21,14 @@ export default function AuraAILandingPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user && user.userId) {
+        navigate('/dashboard');
+      }
+    }
+    
     // Scroll Reveal Script
     const observerOptions = {
         root: null,
