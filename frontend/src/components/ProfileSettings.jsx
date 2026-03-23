@@ -18,7 +18,7 @@ export default function ProfileSettings() {
 
   useEffect(() => {
     if(user.userId) {
-      fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/profile-stats`, { headers: { 'x-user-id': user.userId } })
+      fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/profile-stats`, { headers: { 'x-user-id': user.userId } })
       .then(r => r.json())
       .then(d => { if(d.success) setStats(d.data); })
       .catch(console.error);

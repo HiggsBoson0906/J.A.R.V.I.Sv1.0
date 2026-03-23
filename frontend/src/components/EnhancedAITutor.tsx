@@ -43,7 +43,7 @@ export default function EnhancedAITutor() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/ask-doubt`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/ask-doubt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question })

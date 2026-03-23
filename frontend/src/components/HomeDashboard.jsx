@@ -18,7 +18,7 @@ export default function HomeDashboard() {
   const [customTask, setCustomTask] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
+    fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { 
         if (d.success) {
@@ -37,7 +37,7 @@ export default function HomeDashboard() {
       })
       .catch(e => console.error("Failed dashboard fetch", e));
       
-    fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
+    fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error("Failed metrics fetch", e));
@@ -46,7 +46,7 @@ export default function HomeDashboard() {
   const handleRegeneratePlan = async () => {
     setLoadingPlan(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/generate-plan`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/generate-plan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export default function HomeDashboard() {
 
     if (isNowCompleted) {
       try {
-        await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/study-session`, {
+        await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/study-session`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export default function HomeDashboard() {
         });
         
         // Live refresh so the metric visibly increments (Bypass Browser GET Cache)
-        const pRes = await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/performance?t=${Date.now()}`, { 
+        const pRes = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/performance?t=${Date.now()}`, { 
             headers: { 'x-user-id': user.userId || '' },
             cache: 'no-store' 
         });

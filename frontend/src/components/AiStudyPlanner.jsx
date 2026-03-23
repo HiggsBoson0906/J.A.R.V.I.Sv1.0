@@ -47,7 +47,7 @@ export default function AiStudyPlanner() {
   const [newSubText, setNewSubText] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/planner`, { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/planner`, { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { 
           if (d.success && d.data.plan) {
@@ -66,7 +66,7 @@ export default function AiStudyPlanner() {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://j-a-r-v-i-sv1-0.onrender.com/api'}/generate-plan`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}/generate-plan`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
