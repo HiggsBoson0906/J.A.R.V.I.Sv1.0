@@ -139,7 +139,7 @@ export default function ProfileSettings() {
           <div className="grid grid-cols-12 gap-8">
 
             {/* Editable Details Card */}
-            <div className="col-span-12 lg:col-span-5">
+            <div className="col-span-12">
               <div className="bg-white dark:bg-slate-900 rounded-xl p-7 shadow-sm border border-slate-200 dark:border-slate-800 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold font-headline text-slate-900 dark:text-slate-50">Personal Details</h3>
@@ -149,55 +149,6 @@ export default function ProfileSettings() {
                   <Field icon={<User className="w-4 h-4"/>} label="Full Name" fieldKey="name" />
                   <Field icon={<Mail className="w-4 h-4"/>} label="Email Address" fieldKey="email" type="email" />
                   <Field icon={<Target className="w-4 h-4"/>} label="Target Exam" fieldKey="targetExam" isSelect />
-                </div>
-              </div>
-            </div>
-
-            {/* Learning Analytics */}
-            <div className="col-span-12 lg:col-span-7 space-y-6">
-              <h3 className="text-lg font-bold font-headline text-slate-900 dark:text-slate-50">Learning Analytics</h3>
-              <div className="grid grid-cols-2 gap-5">
-                <div className="bg-white dark:bg-slate-900 p-7 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center justify-between mb-3">
-                    <BarChart2 className="text-cyan-600 dark:text-cyan-400 w-7 h-7" />
-                    {stats?.strongest && (
-                      <span className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 truncate max-w-[120px]">
-                        Strongest: {stats.strongest.topic_name}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Focus Time</p>
-                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">{(stats?.focus_time ? (stats.focus_time/60).toFixed(1) : "0.0")} <span className="text-base font-normal text-slate-400">hrs</span></h4>
-                </div>
-                <div className="bg-white dark:bg-slate-900 p-7 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center justify-between mb-3">
-                    <CheckCircle className="text-cyan-600 dark:text-cyan-400 w-7 h-7" />
-                    {stats?.weakest && (
-                      <span className="text-[10px] font-bold bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full border border-red-100 dark:border-red-500/20 truncate max-w-[120px]">
-                        Weakest: {stats.weakest.topic_name}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tests Attempted</p>
-                  <h4 className="text-3xl font-black text-slate-900 dark:text-slate-50 mt-1">{stats?.tests || 0} <span className="text-base font-normal text-slate-400">Q's</span></h4>
-                </div>
-              </div>
-
-              {/* Revision Table */}
-              <div className="bg-white dark:bg-slate-900 rounded-xl p-7 shadow-sm border border-slate-200 dark:border-slate-800 mt-6">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">Urgent Revision Needed</h3>
-                <div className="space-y-3 mt-4">
-                  {stats?.revisions && stats.revisions.length > 0 ? stats.revisions.map((rev, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10">
-                      <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{rev.topic_name}</p>
-                        <p className="text-[10px] uppercase font-bold text-red-400 tracking-wider font-semibold">{rev.subject_name}</p>
-                      </div>
-                      <span className="text-xs font-bold text-red-600 dark:text-red-400">{rev.accuracy}% Acc</span>
-                    </div>
-                  )) : (
-                     <p className="text-sm text-slate-500 italic">No critically weak topics detected yet. Keep up the good work!</p>
-                  )}
                 </div>
               </div>
             </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import { ChevronRight, RotateCcw, ArrowLeft, CheckCircle, XCircle, Target, Beaker, BookOpen, Calculator, Flame, Award, Zap, ChevronLeft } from 'lucide-react';
 
-const API = import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}`;
+const API = `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://j-a-r-v-i-sv1-0.onrender.com/api')}`;
 
 function AccuracyBadge({ accuracy }) {
   if (accuracy === null || accuracy === undefined) {
@@ -22,7 +22,11 @@ function SubjectView({ onSelect }) {
   useEffect(() => {
     fetch(`${API}/practice/subjects`, { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
-      .then(d => { if (d.success) setSubjects(d.data.subjects); })
+      .then(d => { 
+          if (d.success) {
+              setSubjects(d.data.subjects.filter(s => s !== 'Task Completion')); 
+          }
+      })
       .catch(() => setSubjects(['Physics', 'Chemistry', 'Mathematics']))
       .finally(() => setLoading(false));
   }, []);

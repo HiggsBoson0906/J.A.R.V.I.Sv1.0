@@ -20,6 +20,15 @@ async function getPrimaryDB() {
         const primaryPath = process.env.DB_PATH || path.join(__dirname, 'jarvis.db');
         ensureDirectoryExistence(primaryPath);
         
+        // Auto-seed the persistent volume on Render if it's empty
+        if (process.env.DB_PATH && !fs.existsSync(primaryPath)) {
+            const localBackup = path.join(__dirname, 'jarvis.db');
+            if (fs.existsSync(localBackup)) {
+                console.log(`[DB] Seeding persistent volume from local repository fallback...`);
+                fs.copyFileSync(localBackup, primaryPath);
+            }
+        }
+        
         primaryDBPromise = open({
             filename: primaryPath,
             driver: sqlite3.Database
@@ -42,6 +51,15 @@ async function getSecondaryDB() {
     if (!secondaryDBPromise) {
         const secondaryPath = process.env.DB_PATH_2 || path.join(__dirname, 'second.db');
         ensureDirectoryExistence(secondaryPath);
+        
+        // Auto-seed the persistent volume on Render if it's empty
+        if (process.env.DB_PATH_2 && !fs.existsSync(secondaryPath)) {
+            const localBackup = path.join(__dirname, 'second.db');
+            if (fs.existsSync(localBackup)) {
+                console.log(`[DB] Seeding persistent volume from secondary local fallback...`);
+                fs.copyFileSync(localBackup, secondaryPath);
+            }
+        }
         
         secondaryDBPromise = open({
             filename: secondaryPath,

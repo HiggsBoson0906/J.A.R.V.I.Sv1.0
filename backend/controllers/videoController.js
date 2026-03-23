@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { YoutubeTranscript } = require('youtube-transcript');
 const { GoogleGenAI } = require("@google/genai");
 
 // Cache
@@ -26,9 +25,10 @@ exports.processVideo = async (req, res) => {
             return res.json({ success: true, data: transcriptCache.get(videoId) });
         }
 
-        // 2. Fetch transcript
+        // 2. Fetch transcript (Dynamic ESM Import to bypass CJS Breakage)
         let transcriptItems;
         try {
+            const { YoutubeTranscript } = await import('youtube-transcript/dist/youtube-transcript.esm.js');
             transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
         } catch (error) {
             console.error("Transcript fetch error:", error);
