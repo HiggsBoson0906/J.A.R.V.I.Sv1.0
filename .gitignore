@@ -1,5 +1,5 @@
 # API Keys and Secrets (CRITICAL)
-.env
+backend/.env
 *.env
 .env.local
 .env.development.local
