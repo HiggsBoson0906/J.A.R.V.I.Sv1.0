@@ -33,22 +33,30 @@ exports.processVideo = async (req, res) => {
         } catch (error) {
             console.warn("Primary transcript fetch failed (possibly Render IP blocked). Falling back to Proxy...", error.message);
             
-            // Backup Proxy Scraper Handler to circumvent Render's Datacenter 429 block
+            // Backup Web Scraper to circumvent Render's Datacenter 429 block
             try {
-                const proxy = 'https://api.allorigins.win/raw?url=';
-                const ytUrl = encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`);
-                const htmlResponse = await fetch(proxy + ytUrl);
+                const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                const htmlResponse = await fetch(ytUrl, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+                        'Accept-Language': 'en-US,en;q=0.9'
+                    }
+                });
                 const html = await htmlResponse.text();
                 
-                const match = html.match(/ytInitialPlayerResponse\s*=\s*({.+?})\s*;/);
-                if (!match) throw new Error("Could not parse YouTube response through proxy");
+                const match = html.match(/"captions":({.+?}),"videoDetails"/);
+                if (!match) throw new Error("Could not parse YouTube Captions object from HTML");
                 
-                const playerResponse = JSON.parse(match[1]);
-                const tracks = playerResponse.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+                const captionsObj = JSON.parse(match[1]);
+                const tracks = captionsObj?.playerCaptionsTracklistRenderer?.captionTracks;
                 if (!tracks || !tracks.length) throw new Error("No captions attached to video");
                 
-                // Fetch the inner XML via proxy
-                const xmlResponse = await fetch(proxy + encodeURIComponent(tracks[0].baseUrl));
+                // Fetch the inner XML using the signed URL
+                const xmlResponse = await fetch(tracks[0].baseUrl, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+                    }
+                });
                 const xml = await xmlResponse.text();
                 
                 const textMatches = xml.match(/<text.*?>([^<]+)<\/text>/g) || [];
@@ -60,7 +68,7 @@ exports.processVideo = async (req, res) => {
                     return { text };
                 });
             } catch (proxyError) {
-                console.error("Proxy transcript fallback also failed:", proxyError.message);
+                console.error("Crawler transcript fallback also failed:", proxyError.message);
                 return res.json({ success: false, message: 'Transcript not available securely. Try local.' });
             }
         }
