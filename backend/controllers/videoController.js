@@ -33,43 +33,43 @@ exports.processVideo = async (req, res) => {
         } catch (error) {
             console.warn("Primary transcript fetch failed (possibly Render IP blocked). Falling back to Proxy...", error.message);
             
-            // Backup Web Scraper to circumvent Render's Datacenter 429 block
+            // Ultimate Fallback: Execute native yt-dlp binary to defeat 429 Data Center bans
             try {
-                const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
-                const htmlResponse = await fetch(ytUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-                        'Accept-Language': 'en-US,en;q=0.9'
-                    }
+                const youtubedl = require('youtube-dl-exec');
+                const output = await youtubedl(`https://www.youtube.com/watch?v=${videoId}`, {
+                    dumpJson: true,
+                    noCheckCertificates: true,
+                    noWarnings: true,
+                    addHeader: ['referer:youtube.com', 'user-agent:Mozilla/5.0']
                 });
-                const html = await htmlResponse.text();
                 
-                const match = html.match(/"captions":({.+?}),"videoDetails"/);
-                if (!match) throw new Error("Could not parse YouTube Captions object from HTML");
+                const subs = output.subtitles && Object.keys(output.subtitles).length > 0 ? output.subtitles : output.automatic_captions;
+                if (!subs || Object.keys(subs).length === 0) throw new Error("No subtitles array in yt-dlp");
                 
-                const captionsObj = JSON.parse(match[1]);
-                const tracks = captionsObj?.playerCaptionsTracklistRenderer?.captionTracks;
-                if (!tracks || !tracks.length) throw new Error("No captions attached to video");
+                const enTrack = subs['en'] || subs['en-US'] || subs[Object.keys(subs)[0]];
+                if (!enTrack || !enTrack.length) throw new Error("No valid caption track located");
                 
-                // Fetch the inner XML using the signed URL
-                const xmlResponse = await fetch(tracks[0].baseUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-                    }
-                });
+                const srv1 = enTrack.find(t => t.ext === 'srv1') || enTrack[0];
+                const xmlResponse = await fetch(srv1.url);
                 const xml = await xmlResponse.text();
                 
-                const textMatches = xml.match(/<text.*?>([^<]+)<\/text>/g) || [];
-                transcriptItems = textMatches.map(t => {
-                    const text = t.replace(/<text.*?>|<\/text>/g, '')
-                                  .replace(/&amp;/g, '&')
-                                  .replace(/&#39;/g, "'")
-                                  .replace(/&quot;/g, '"');
-                    return { text };
-                });
+                if (srv1.ext === 'json3' || xml.trim().startsWith('{')) {
+                    const parsed = JSON.parse(xml);
+                    transcriptItems = (parsed.events || []).map(e => ({ text: (e.segs || []).map(s => s.utf8).join('') }));
+                } else {
+                    const textMatches = xml.match(/<text.*?>([^<]+)<\/text>/g) || [];
+                    transcriptItems = textMatches.map(t => {
+                        const text = t.replace(/<text.*?>|<\/text>/g, '')
+                                      .replace(/&amp;/g, '&')
+                                      .replace(/&#39;/g, "'")
+                                      .replace(/&quot;/g, '"')
+                                      .replace(/&#34;/g, '"');
+                        return { text };
+                    });
+                }
             } catch (proxyError) {
-                console.error("Crawler transcript fallback also failed:", proxyError.message);
-                return res.json({ success: false, message: 'Transcript not available securely. Try local.' });
+                console.error("YT-DLP transcript fallback also failed:", proxyError.message);
+                return res.json({ success: false, message: 'Transcript securely blocked by YouTube. Provide a different video.' });
             }
         }
 
