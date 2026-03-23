@@ -96,9 +96,31 @@ export default function AuraAIAuth() {
       {/* Header */}
       <header className="fixed top-0 w-full z-50 flex justify-between items-center px-8 py-6 bg-gradient-to-b from-slate-950/50 to-transparent backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <span className="text-3xl font-headline font-black tracking-tighter text-indigo-400 drop-shadow-[0_0_12px_rgba(79,70,229,0.8)] cursor-pointer" onClick={() => navigate('/')}>
-            AURA AI
-          </span>
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-cyan-400/50 flex items-center justify-center shadow-lg shadow-cyan-500/30 relative overflow-hidden">
+              <div className="absolute inset-0 bg-cyan-400/5 rounded-xl"></div>
+              <div className="relative w-7 h-7 flex items-center justify-center">
+                <div className="absolute inset-0 animate-spin" style={{animationDuration:'10s'}}>
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="13" stroke="#22d3ee" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.45"/>
+                  </svg>
+                </div>
+                <div className="absolute inset-0 animate-spin" style={{animationDuration:'7s', animationDirection:'reverse'}}>
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="9" stroke="#22d3ee" strokeWidth="1" strokeDasharray="5 2" opacity="0.65"/>
+                  </svg>
+                </div>
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="absolute inset-0">
+                  <circle cx="14" cy="14" r="5.5" stroke="#22d3ee" strokeWidth="1.5"/>
+                  <circle cx="14" cy="14" r="2.5" fill="#22d3ee"/>
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h1 className="text-2xl font-black tracking-tighter font-headline text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]">J.A.R.V.I.S.</h1>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Study Platform</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 ml-4 hidden sm:flex">
             <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981] animate-[pulse_2s_infinite]"></div>
             <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-400">System Online</span>
@@ -301,7 +323,7 @@ export default function AuraAIAuth() {
       {/* Footer Component (Shared) */}
       <footer className="fixed bottom-0 w-full flex flex-col md:flex-row justify-between items-center px-8 py-6 gap-4 bg-slate-950/90 backdrop-blur-md z-50">
         <p className="font-label text-xs uppercase tracking-widest text-slate-500">
-          © 2024 AURA AI Platform. Engineered for Excellence.
+          © 2026 V.A.R.V.I.S.  AI Platform. Engineered for Excellence.
         </p>
         <div className="flex gap-6">
           <a className="font-label text-xs uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors" href="#">Privacy</a>
