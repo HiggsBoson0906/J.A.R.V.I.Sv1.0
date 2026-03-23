@@ -8,12 +8,12 @@ export default function PerformanceInsights() {
   const [dashData, setDashData] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error(e));
 
-    fetch('http://localhost:3001/api/dashboard', { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setDashData(d.data); })
       .catch(e => console.error("Error fetching dashboard", e));
@@ -92,16 +92,24 @@ export default function PerformanceInsights() {
             <div className="bg-white dark:bg-slate-900 p-6 rounded-lg flex flex-col gap-4 shadow-sm border border-slate-200 dark:border-slate-800">
                <h4 className="font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div>Due Today</h4>
                <ul className="space-y-3 mt-2">
-                 {dashData?.today_plan && dashData.today_plan.length > 0 ? (
-                   dashData.today_plan.slice(0, 3).map((taskText, idx) => (
-                     <li key={idx} className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
-                       <span className="text-slate-700 dark:text-slate-300 font-medium truncate pr-2" title={taskText}>{taskText}</span>
-                       <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold whitespace-nowrap">Priority</span>
-                     </li>
-                   ))
-                 ) : (
-                   <p className="text-sm text-slate-500 dark:text-slate-400">No immediate tasks scheduled.</p>
-                 )}
+                 {(() => {
+                   const cachedRaw = localStorage.getItem('syncedPlan');
+                   const cached = cachedRaw ? JSON.parse(cachedRaw) : null;
+                   const planToDisplay = (cached && cached.length > 0)
+                     ? cached.map(t => `${(t.time||'').split(' - ')[0]} | ${t.task}`)
+                     : (dashData?.today_plan || []);
+                     
+                   return planToDisplay.length > 0 ? (
+                     planToDisplay.slice(0, 3).map((taskText, idx) => (
+                       <li key={idx} className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-slate-800 pb-2">
+                         <span className="text-slate-700 dark:text-slate-300 font-medium truncate pr-2" title={taskText}>{taskText}</span>
+                         <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold whitespace-nowrap">Priority</span>
+                       </li>
+                     ))
+                   ) : (
+                     <p className="text-sm text-slate-500 dark:text-slate-400">No immediate tasks scheduled.</p>
+                   );
+                 })()}
                </ul>
             </div>
             

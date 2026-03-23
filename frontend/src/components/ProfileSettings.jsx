@@ -18,7 +18,7 @@ export default function ProfileSettings() {
 
   useEffect(() => {
     if(user.userId) {
-      fetch('http://localhost:3001/api/profile-stats', { headers: { 'x-user-id': user.userId } })
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/profile-stats`, { headers: { 'x-user-id': user.userId } })
       .then(r => r.json())
       .then(d => { if(d.success) setStats(d.data); })
       .catch(console.error);

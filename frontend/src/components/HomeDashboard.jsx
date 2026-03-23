@@ -18,17 +18,26 @@ export default function HomeDashboard() {
   const [customTask, setCustomTask] = useState("");
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/dashboard', { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/dashboard?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { 
         if (d.success) {
           setDashboardData(d.data);
-          setTodayPlan(d.data.today_plan.map(t => ({ text: `Revise foundational concepts in ${t}`, rawTopic: t, completed: false })));
+          const cachedPlan = JSON.parse(localStorage.getItem('syncedPlan'));
+          if (cachedPlan && cachedPlan.length > 0) {
+              setTodayPlan(cachedPlan.map(t => ({ 
+                  text: `${(t.time||'').split(' - ')[0]} | ${t.task}`, 
+                  rawTopic: t.task, 
+                  completed: false 
+              })));
+          } else {
+              setTodayPlan(d.data.today_plan.map(t => ({ text: `Revise foundational concepts in ${t}`, rawTopic: t, completed: false })));
+          }
         } 
       })
       .catch(e => console.error("Failed dashboard fetch", e));
       
-    fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/performance?t=${Date.now()}`, { headers: { 'x-user-id': user.userId || '' }, cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d.success) setPerfData(d.data); })
       .catch(e => console.error("Failed metrics fetch", e));
@@ -37,7 +46,7 @@ export default function HomeDashboard() {
   const handleRegeneratePlan = async () => {
     setLoadingPlan(true);
     try {
-      const res = await fetch('http://localhost:3001/api/generate-plan', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/generate-plan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -66,7 +75,7 @@ export default function HomeDashboard() {
 
     if (isNowCompleted) {
       try {
-        await fetch('http://localhost:3001/api/study-session', {
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/study-session`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -79,8 +88,11 @@ export default function HomeDashboard() {
             })
         });
         
-        // Live refresh so the metric visibly increments
-        const pRes = await fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId || '' } });
+        // Live refresh so the metric visibly increments (Bypass Browser GET Cache)
+        const pRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/performance?t=${Date.now()}`, { 
+            headers: { 'x-user-id': user.userId || '' },
+            cache: 'no-store' 
+        });
         const pData = await pRes.json();
         if (pData.success) {
             setPerfData(pData.data);
@@ -88,7 +100,16 @@ export default function HomeDashboard() {
         
         // Remove from UI after a short delay to allow the animation to play
         setTimeout(() => {
-           setTodayPlan(prev => prev.filter((_, i) => i !== idx));
+           setTodayPlan(prev => {
+               const newPlan = prev.filter((_, i) => i !== idx);
+               // Also sync deletion with LocalStorage so it doesn't resurrect on refresh
+               const cachedPlan = JSON.parse(localStorage.getItem('syncedPlan'));
+               if (cachedPlan) {
+                   const updatedCache = cachedPlan.filter(ct => ct.task !== (fresh[idx].rawTopic || fresh[idx].text));
+                   localStorage.setItem('syncedPlan', JSON.stringify(updatedCache));
+               }
+               return newPlan;
+           });
         }, 800);
       } catch(e) { console.error("Failed to sync task time", e); }
     }

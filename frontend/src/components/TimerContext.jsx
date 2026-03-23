@@ -19,7 +19,7 @@ export const TimerProvider = ({ children }) => {
             
             const durationSecs = (parseInt(mode) * 60) - timeLeft;
             const durationMins = Math.floor(durationSecs / 60) || parseInt(mode); 
-            fetch('http://localhost:3001/api/study-session', {
+            fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/study-session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const TimerProvider = ({ children }) => {
          const durationSecs = (parseInt(mode) * 60) - timeLeft;
          const durationMins = Math.floor(durationSecs / 60) || 1; 
 
-         fetch('http://localhost:3001/api/study-session', {
+         fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/study-session`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',

@@ -10,7 +10,7 @@ export default function FocusTimer() {
 
   useEffect(() => {
     if(user.userId) {
-       fetch('http://localhost:3001/api/performance', { headers: { 'x-user-id': user.userId } })
+       fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/performance`, { headers: { 'x-user-id': user.userId } })
          .then(r => r.json())
          .then(d => {
              if(d.success && d.data.focus_hours) {

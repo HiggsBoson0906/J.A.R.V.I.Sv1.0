@@ -47,7 +47,7 @@ export default function AiStudyPlanner() {
   const [newSubText, setNewSubText] = useState("");
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/planner', { headers: { 'x-user-id': user.userId || '' } })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/planner`, { headers: { 'x-user-id': user.userId || '' } })
       .then(r => r.json())
       .then(d => { 
           if (d.success && d.data.plan) {
@@ -66,7 +66,7 @@ export default function AiStudyPlanner() {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/generate-plan', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/generate-plan`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -120,17 +120,8 @@ export default function AiStudyPlanner() {
 
   const handleSync = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/sync-plan', {
-         method: 'POST',
-         headers: { 
-             'Content-Type': 'application/json',
-             'x-user-id': user.userId || ''
-         },
-         body: JSON.stringify({ plan: plannerTasks })
-      });
-      if (res.ok) {
-         window.location.href = '/dashboard';
-      }
+      localStorage.setItem('syncedPlan', JSON.stringify(plannerTasks));
+      window.location.href = '/dashboard';
     } catch(e) { console.error(e); }
   };
 
