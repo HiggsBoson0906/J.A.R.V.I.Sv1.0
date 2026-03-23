@@ -5,7 +5,10 @@ backend/.env
 .env.development.local
 .env.test.local
 .env.production.local
-
+node_modules/
+.env
+*.db-shm
+*.db-wal
 # Dependencies
 node_modules/
 jspm_packages/
